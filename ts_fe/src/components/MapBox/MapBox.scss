@@ -1,0 +1,17 @@
+.mapbox-container {
+  height: 100%;
+  width: 100%;
+  &--renderer {
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    background-color: rgba(33, 51, 122, 0.75);
+    .maplibregl-map {
+      width: 100%;
+      height: 100%;
+      border: .15rem inset #333;
+      border-radius: 1.5rem;
+      box-shadow: 0.15rem 0.15rem .25rem #efefef;
+    }
+  }
+};

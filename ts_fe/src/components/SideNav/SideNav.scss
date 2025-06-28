@@ -1,0 +1,65 @@
+.sidenav {
+  width: 250px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: .1rem inset #333;
+  box-shadow: 5px 0 5px rgba(0,0,0,0.1);
+  background-color: rgba(33, 51, 122, .75);
+  z-index: 1000;
+  &--header {
+    min-width: 75px;
+    min-height: 30px;
+    margin-bottom: 2rem;
+    margin-top: .25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: 600;
+    >span {
+      cursor: inherit;
+    }
+  }
+  &--content {
+    background-color: #333333f0;
+    &-item {
+      cursor: pointer;
+      padding: .25rem;
+      padding-left: .5rem;
+      text-transform: uppercase;
+      &:hover {
+        display: inline-block;
+        background-color: rgba(255, 255, 255, 0.15);
+        box-shadow: .25rem .25rem 20rem rgba(95, 94, 94, .2);
+        border-radius: .25rem;
+      }
+    }
+    &-switch {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+      padding-top: .5rem;
+    }
+    &-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      >button:first-of-type {
+        margin-bottom: 1rem;
+      }
+    }
+    &-results {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-content: center;
+      align-items: center;
+      margin-top: 1rem;
+    }
+  }
+}

@@ -1,0 +1,2 @@
+[2025-06-25T01:37:14.521Z] [WARN] Test file log message with level
+[2025-06-25T01:37:14.521Z] [INFO] Test file log message with level

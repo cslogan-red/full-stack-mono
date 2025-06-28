@@ -1,0 +1,53 @@
+{
+  "name": "r_proxy",
+  "version": "1.0.0",
+  "description": "Simple TypeScript (ts-node) http reverse proxy implementation for Node.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "prepublishDryRun": "npm run build && ts-node src/index.ts",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "pretest": "npm run lint",
+    "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch --clearCache",
+    "clean": "rimraf node_modules dist",
+    "start": "ts-node src/index.ts",
+    "startConcurrently": "concurrently \"npm:run:proxy\" \"npm:run:webserver\"",
+    "run:proxy": "ts-node src/clients/proxyClient.ts",
+    "run:webserver": "ts-node src/clients/webServerClient.ts"
+  },
+  "author": "cslogan-red",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.29.0",
+    "@types/express": "^4.17.23",
+    "@types/http-proxy": "^1.17.16",
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.0",
+    "globals": "^16.2.0",
+    "jest": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
+    "prettier": "^3.6.0",
+    "rimraf": "^5.0.1",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.17",
+    "axios": "^1.6.0",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^2.0.6",
+    "uuid": "^11.1.0"
+  }
+}

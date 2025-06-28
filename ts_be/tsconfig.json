@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2018", // Target ECMAScript version
+    "module": "commonjs", // Module system
+    "declaration": true, // Generate .d.ts files
+    "outDir": "dist", // Output directory for compiled files
+    "strict": true, // Enable strict type-checking options
+    "esModuleInterop": true, // Allow default imports from CommonJS modules
+    "types": ["jest", "node"], // Include type definitions for Jest and Node.js
+    "typeRoots": ["./node_modules/@types"], // Specify type definitions folder
+    "sourceMap": true, // Generate source maps for debugging
+    "incremental": true, // Enable incremental compilation
+    "noFallthroughCasesInSwitch": true // Ensure all switch cases are handled
+  },
+  "exclude": ["node_modules", "dist", "build", "coverage"] // Exclude unnecessary directories
+}
