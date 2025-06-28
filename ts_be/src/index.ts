@@ -19,7 +19,7 @@ export const entryPoint = async () => {
   const webServerClient = new WebServerClient("http://localhost:4001");
 
   webServerClient
-    .get("/api/data")
+    .get("/api/v1/latlng")
     .then((data) => console.log("Data from web server:", data))
     .catch((err) => console.error("Error fetching data:", err));
 };

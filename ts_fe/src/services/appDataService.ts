@@ -24,7 +24,7 @@ export type WorkerDataResponseType = {
 export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
   const { startLat, startLng, batchSize = 25, isSmall } = props;
   const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
-  const result = await fetch(`http://localhost:5173/local/api/data?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`);
+  const result = await fetch(`http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`);
   const resultJson = await result.json();
   // simulate compute intensive workload on every data hyrdation request
   const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));

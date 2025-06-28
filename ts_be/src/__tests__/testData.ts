@@ -19,12 +19,12 @@ export const testDataProps: TestDataPropsType = {
 };
 
 type TestDataReqType = {
-  url: "/api/data";
+  url: "/api/v1/latlng";
   method: "GET" | "POST" | "PUT" | "DELETE";
 };
 
 export const testDataReqProps: TestDataReqType = {
-  url: "/api/data",
+  url: "/api/v1/latlng",
   method: "GET",
 };
 

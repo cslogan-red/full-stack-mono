@@ -11,7 +11,7 @@ npm install && docker build -t node-proxy-webserver .
 # start the container running ports for the webserver and proxy
 docker run -p 3001:3001 -p 4001:4001 node-proxy-webserver
 ```
-Observe postman requests the proxy at `http://localhost:3001/api/data` return the Express server (running at 4001) hello
+Observe postman requests the proxy at `http://localhost:3001/api/v1/latlng` return the Express server (running at 4001) hello
 and that invalid SQL injection character attempts are forbidden by default
 
 ### Logging

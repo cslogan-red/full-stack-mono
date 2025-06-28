@@ -11,7 +11,7 @@ enum WebServerClientPorts {
 /**
  * A minimal Node.js Express webserver, example usage:
  * const client = new WebServerClient();
- * client.get('/api/data')
+ * client.get('api/v1/latlng')
  * .then(data => console.log('Response from server:', data))
  * .catch(err => console.error('Error:', err));
  */
