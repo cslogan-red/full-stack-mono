@@ -56,6 +56,9 @@
       >button:first-of-type {
         margin-bottom: $m-small;
       }
+      &-input {
+        margin-bottom: $m-x-small;
+      }
     }
     &-results {
       display: flex;

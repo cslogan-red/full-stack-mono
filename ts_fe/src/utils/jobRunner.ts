@@ -6,17 +6,12 @@ interface JOB_RUNNER_OPTIONS {
 }
 
 /**
- * This function accepts as a parameter a function "userFunc"
- * And as a result returns an anonymous function.
- * This anonymous function, accepts as arguments,
- * the parameters to pass to the function "useArgs" and returns a Promise
- * This function can be used as a wrapper, only inside a Worker
- * because it depends by "postMessage".
- *
- * @param {Function} userFunc {Function} fn the function to run with web worker
- *
- * @returns {Function} returns a function that accepts the parameters
- * to be passed to the "userFunc" function
+ * wrapper accepts a user function (@fn) & returns an anonymous function
+ * that executes with the user supplied params of the user function
+ * but in the context of a web worker to do the work of the supplied user function
+ * sending the results (whether SUCCESS or ERROR) back to the main thread via postMessage
+ * 
+ * only meant to be used in web worker context due to reliance on postMessage
  */
 export const workerJobRunner =
   (options: JOB_RUNNER_OPTIONS): Function =>

@@ -34,10 +34,7 @@ export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDa
 };
 
 /**
- * Simulate fetching a large dataset + complex computational work on every data hyrdation request
- * In single-threaded (UI thread) mode this will result in UI chug and stuttering, while
- * mulit-threaded requests pushed to Workers through useWorker hook continue to process separately
- * passing data back to the main thread in pages as it becomes available for a smooth UI experience
+ * Simulate fetching a large dataset locally for quick testing of algorithm changes
  * @param props @WorkerPropsType
  * @returns @WorkerDataResponseType
  */
@@ -55,30 +52,40 @@ export const localWorkerDataSet = async (props: WorkerPropsType): Promise<Worker
   return new Promise<WorkerDataResponseType>((resolve) => {
     return setTimeout(() => {
       // calculate the entire possible list based on the input batch size
-      const ARC_DEGREE_SEP = 0.00001;
+      const ARC_DEGREE_SEP = isSmall ? 0.000015 : 0.00001;
       for (let i = 0; i < batchSize; i++) {
         const currentResult = { lat: 0, lng: 0 };
         const latSep =
-          acc.length === 0 ? START_LAT * ARC_DEGREE_SEP : acc[i - 1].lat * ARC_DEGREE_SEP;
+          acc.length === 0
+            ? START_LAT * ARC_DEGREE_SEP
+            : acc[i - 1].lat * ARC_DEGREE_SEP;
         const lngSep =
-          acc.length === 0 ? START_LNG * ARC_DEGREE_SEP : acc[i - 1].lng * ARC_DEGREE_SEP;
+          acc.length === 0
+            ? START_LNG * ARC_DEGREE_SEP
+            : acc[i - 1].lng * ARC_DEGREE_SEP;
 
-        currentResult.lat = acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep;
-        currentResult.lng = acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep;
+        currentResult.lat =
+          acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep - (isSmall ? .0025 : 0);
+        currentResult.lng =
+          acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall ? .0025 : 0);
         acc.push(currentResult);
       }
       // if the batch size is greater than PAGE_SIZE, handle pagination by searching
       // for window within complete list of options
       if (startLat && startLng) {
         // n+1 pagination
-        const sI = acc.findIndex((val) => val.lat === startLat);
+        const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
         const pageAcc: LatLongResponseType[] = [];
-        for (let i = sI + 1; i < (sI + 1) * 2; i++) {
+        for (let i = sI + 1; i < (sI + 1 + PAGE_SIZE); i++) {
           if (acc[i]) {
             pageAcc.push(acc[i]);
           }
         }
-        if (pageAcc.length === PAGE_SIZE && sI * 2 !== batchSize - 2) {
+        console.log(startLat, sI, pageAcc, batchSize)
+        if (
+          pageAcc.length === PAGE_SIZE &&
+          sI * 2 !== batchSize - 2
+        ) {
           returnVal.nextToken = pageAcc[pageAcc.length - 1];
           returnVal.results = [...pageAcc];
         } else {

@@ -22,6 +22,11 @@ type MapBoxProps = {
   renderer?: MapBoxRenderersType;
 };
 
+// add to your local .env file in the root of ts_fe:
+// VITE_MAP_URL="https://api.maptiler.com/maps/streets-v2/style.json?key=<your_API_key>"
+// maptiler API keys & signup is free!
+const MAP_URL = import.meta.env.VITE_MAP_URL; 
+
 // simple MapBox component render switching for the purpose of the demo
 const MapBox = ({
   startLat,
@@ -53,7 +58,7 @@ const MapBox = ({
       )),
     [longLatLngMarkerCoords],
   );
-
+  console.log()
   return (
     <div className={'mapbox-container'}>
       <div className={'mapbox-container--renderer'}>
@@ -68,7 +73,7 @@ const MapBox = ({
               latitude: startLat,
               zoom: 11.5,
             }}
-            mapStyle="https://api.maptiler.com/maps/streets-v2/style.json?key=sDeVrH8WtKHcqvBHk96C"
+            mapStyle={MAP_URL}
             mapLib={import('maplibre-gl')}
           >
             {[...markers, ...longMarkers]}

@@ -7,9 +7,11 @@ export type WorkerSizeType = (typeof WORKER_SIZE)[keyof typeof WORKER_SIZE];
 
 export const BATCH_SIZE = {
   small: 100,
-  large: 20000,
+  smallMax: 500,
+  large: 10000,
+  largeMax: 50000,
 };
 
 // map start point (SF bay)
-export const EXT_START_LNG = -122.4;
-export const EXT_START_LAT = 37.78;
+export const EXT_START_LNG = -122.41;
+export const EXT_START_LAT = 37.75;

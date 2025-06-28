@@ -1,9 +1,9 @@
 /**
  *
- * Concatenates the remote dependencies into a comma separated string.
+ * concatenates the remote dependencies into a comma separated string.
  * this string will then be passed as an argument to the "importScripts" function
  *
- * @param {Array.<String>}} deps array of string
+ * @param {Array.<String>} deps array of string
  * @returns {String} a string composed by the concatenation of the "deps" and "importScripts"
  *
  * @example

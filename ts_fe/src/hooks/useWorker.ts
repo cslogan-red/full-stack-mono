@@ -45,7 +45,8 @@ const DEFAULT_OPTIONS: OptionsType = {
  * on a singluar web worker thread, based on the provided work through @fn & @options
  *
  * it handles lifecycle (run, kill) as well as orchestration of job statuses
- * sent back from the web worker thread(s)
+ * sent back from the web worker thread(s), whose work is executed via supplied user
+ * functions to jobRunner, which is converted to a worker Blob URL and executed here
  *
  * create multiple useWorker instances to run parallel threads
  *

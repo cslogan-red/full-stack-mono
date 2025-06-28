@@ -38,7 +38,7 @@ export const getLatLng = async (
   const START_LAT = isSmall === "true" ? 37.8 : 37.7;
   const PAGE_SIZE = 25;
   // calculate the entire possible list based on the input batch size
-  const ARC_DEGREE_SEP = 0.00001;
+  const ARC_DEGREE_SEP = isSmall ? 0.000015 : 0.00001;
   for (let i = 0; i < parseInt(batchSize as string); i++) {
     const currentResult = { lat: 0, lng: 0 };
     const latSep =
@@ -51,9 +51,9 @@ export const getLatLng = async (
         : acc[i - 1].lng * ARC_DEGREE_SEP;
 
     currentResult.lat =
-      acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep;
+      acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep - (isSmall === "true" ? .0025 : 0);
     currentResult.lng =
-      acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep;
+      acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall === "true" ? .0025 : 0);
     acc.push(currentResult);
   }
   // if the batch size is greater than PAGE_SIZE, handle pagination by searching
@@ -62,11 +62,12 @@ export const getLatLng = async (
     // n+1 pagination
     const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
     const pageAcc: LatLongType[] = [];
-    for (let i = sI + 1; i < (sI + 1) * 2; i++) {
+    for (let i = sI + 1; i < (sI + 1 + PAGE_SIZE); i++) {
       if (acc[i]) {
         pageAcc.push(acc[i]);
       }
     }
+    console.log(startLat, sI, pageAcc, batchSize)
     if (
       pageAcc.length === PAGE_SIZE &&
       sI * 2 !== parseInt(batchSize as string) - 2

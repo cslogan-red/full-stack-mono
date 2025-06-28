@@ -5,15 +5,18 @@ import {
   Switch,
   FormGroup,
   FormControlLabel,
+  TextField,
 } from '@mui/material';
 import { WORKER_STATUS } from '../../hooks/useWorker';
-import { type WorkerSizeType } from '../../utils/general';
+import { BATCH_SIZE, type WorkerSizeType } from '../../utils/general';
 // styles
 import './SideNav.scss';
 import { useEffect, useState } from 'react';
 
 type SideNavProps = {
   multiThreadedCheckedHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  smallItemCountHandler: (size: number) => void;
+  largeItemCountHandler: (size: number) => void;
   smallWorkerHandler: {
     status: string;
     kill: Function;
@@ -30,12 +33,16 @@ type SideNavProps = {
 
 const SideNav = ({
   multiThreadedCheckedHandler,
+  smallItemCountHandler,
+  largeItemCountHandler,
   smallWorkerHandler,
   largeWorkerHandler,
   smallWorkerResults,
   largeWorkerResults,
 }: SideNavProps) => {
   const [multiThreadedChecked, setMultiThreadedChecked] = useState(true);
+  const [smallItemCount, setSmallItemCount] = useState(BATCH_SIZE.small);
+  const [largeItemCount, setLargeItemCount] = useState(BATCH_SIZE.large);
   const [smallWorkerStatus, setSmallWorkerStatus] = useState(smallWorkerHandler.status);
   const [largeWorkerStatus, setLargeWorkerStatus] = useState(largeWorkerHandler.status);
   useEffect(() => {
@@ -68,6 +75,20 @@ const SideNav = ({
           </FormGroup>
         </div>
         <div className={'sidenav--content-controls'}>
+          <div className={'sidenav--content-controls-input'}>
+            <TextField
+              placeholder={`Total items (default ${BATCH_SIZE.small})`}
+              error={smallItemCount > BATCH_SIZE.smallMax}
+              helperText={smallItemCount > BATCH_SIZE.smallMax ? `Max ${BATCH_SIZE.smallMax}` : ''}
+              onChange={(e) => {
+                const val = e.currentTarget?.value ? parseInt(e.currentTarget.value) : BATCH_SIZE.small;
+                if (val > 0) {
+                  smallItemCountHandler(val);
+                  setSmallItemCount(parseInt(e.currentTarget.value));
+                }
+              }}
+            />
+          </div>
           <Button
             variant="contained"
             onClick={() => {
@@ -82,6 +103,20 @@ const SideNav = ({
               ? 'Kill Small Worker'
               : 'Start Small Worker'}
           </Button>
+          <div className={'sidenav--content-controls-input'}>
+            <TextField
+              placeholder={`Total items (default ${BATCH_SIZE.large})`}
+              error={largeItemCount > BATCH_SIZE.largeMax}
+              helperText={largeItemCount > BATCH_SIZE.largeMax ? `Max ${BATCH_SIZE.largeMax}` : ''}
+              onChange={(e) => {
+                const val = e.currentTarget?.value ? parseInt(e.currentTarget.value) : BATCH_SIZE.large;
+                if (val > 0) {
+                  largeItemCountHandler(val);
+                  setLargeItemCount(parseInt(e.currentTarget.value));
+                }
+              }}
+            />
+          </div>
           <Button
             variant="contained"
             onClick={() => {
@@ -100,8 +135,8 @@ const SideNav = ({
             <ListItemText
               primary={
                 <div className={'sidenav--content-results'}>
-                  <div>Small Worker Results: {smallWorkerResults && smallWorkerResults > 0 ? `${smallWorkerResults}` : 'N/A'}</div>
-                  <div>Large Worker Results: {largeWorkerResults && largeWorkerResults > 0 ? `${largeWorkerResults}` : 'N/A'}</div>
+                  <div>Small Batch Size: {smallWorkerResults && smallWorkerResults > 0 ? `${smallWorkerResults}` : 'N/A'}</div>
+                  <div>Large Batch Size: {largeWorkerResults && largeWorkerResults > 0 ? `${largeWorkerResults}` : 'N/A'}</div>
                 </div>
               }
             />
