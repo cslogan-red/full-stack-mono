@@ -1,6 +1,8 @@
+@import '../../styles/index.scss';
+
 .app-container {
-  width: 100vw;
-  height: 100vh;
+  width: $app-min-width;
+  height: $app-min-height;
   overflow: hidden;
   &--content {
     position: absolute;

@@ -1,0 +1,41 @@
+/* heights & widths */
+$app-min-width: 100vw;
+$app-min-height: 100vh;
+$page-min-height: 78vh;
+
+$form-radio-width: 1.15rem;
+$form-radio-height: 1.15rem;
+$form-radio-before: .8rem;
+
+$vh-normal: 12vh;
+$vh-normal-forms: 15.5vh;
+$vh-normal-nav: 14.5vh;
+$vh-media-xx-big: 22vh;
+$vh-media-x-big: 17vh;
+$vh-media-big: 14vh;
+$vh-media-small: 10vh;
+$vh-media-x-small: 6vh;
+
+$border-radius: .15rem;
+
+$map-border: .15rem inset $color-dark-gray;
+$nav-border: .1rem inset $color-dark-gray;
+
+/* gutters & spacing */
+$p-xx-small: .25rem;
+$p-x-small: .5rem;
+$p-smallish: .75rem;
+$p-small: 1rem;
+$p-normalish: 1.5rem;
+$p-normal: 2rem;
+$p-large: 3.5rem;
+$p-x-large: 4.5rem;
+
+$m-xx-small: .25rem;
+$m-x-small: .5rem;
+$m-small: 1rem;
+$m-smallish: .75rem;
+$m-normalish: 1.5rem;
+$m-normal: 2rem;
+$m-large: 3.5rem;
+$m-x-large: 4.5rem;

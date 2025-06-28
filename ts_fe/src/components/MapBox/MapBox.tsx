@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import Map, { Marker } from 'react-map-gl/maplibre';
 import MapMarker from '../../assets/mapmarker.svg';
 import AltMapMarker from '../../assets/mapmarker-alt.svg';
+import Screw from '../../assets/screw.svg'
 import { type LatLongResponseType } from '../../services/appDataService';
 // styles
 import './MapBox.scss';
@@ -56,6 +57,10 @@ const MapBox = ({
   return (
     <div className={'mapbox-container'}>
       <div className={'mapbox-container--renderer'}>
+      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
+      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
+      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
+      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
         {renderer === MapBoxRenderers.reactMapGl ? (
           <Map
             initialViewState={{

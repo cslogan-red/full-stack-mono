@@ -8,8 +8,6 @@ const darkTheme = createTheme({
     mode: 'dark',
   },
 });
-// styles
-import './App.scss';
 
 function App() {
   return (

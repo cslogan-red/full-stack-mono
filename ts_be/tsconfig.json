@@ -10,7 +10,7 @@
     "typeRoots": ["./node_modules/@types"], // Specify type definitions folder
     "sourceMap": true, // Generate source maps for debugging
     "incremental": true, // Enable incremental compilation
-    "noFallthroughCasesInSwitch": true // Ensure all switch cases are handled
+    "noFallthroughCasesInSwitch": true, // Ensure all switch cases are handled
   },
   "exclude": ["node_modules", "dist", "build", "coverage"] // Exclude unnecessary directories
 }
