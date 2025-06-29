@@ -122,7 +122,14 @@ export const getLatLngParty = async (
   acc
     .reduce((acc, val, i) => {
       const offset = parseInt(`${Math.random() / 1000000}`.charAt(0));
-      const ARC_DEGREE_SEP = Number(`0.00000${offset}`);
+      const ARC_DEGREE_SEP =
+        i % 5 === 0
+          ? Number(`0.0000${offset}`)
+          : i % 4 === 0
+            ? Number(`0.000${offset}`)
+            : i % 2 === 0
+              ? Number(`0.00000${offset}`)
+              : Number(`0.00000${offset}`);
       val.lat = parseFloat(
         Number(
           i % 2 === 0

@@ -59,7 +59,9 @@ export const getWorkerPartyDataSet = async (
   try {
     const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
     const pageNumStr = pageNum ? `&pageNum=${pageNum}` : '';
-    const result = await fetch(`http://localhost:5173/local/api/v1/latlng/party?${endStr}${pageNumStr}`);
+    const result = await fetch(
+      `http://localhost:5173/local/api/v1/latlng/party?${endStr}${pageNumStr}`,
+    );
     const resultJson = await result.json();
     returnVal = resultJson.returnVal;
 

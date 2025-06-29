@@ -103,7 +103,11 @@ const AppContainer = () => {
       while (paginatedResult.nextToken.lat > 0) {
         paginatedResult = isMT
           ? await partyWorker({ startLat: partyViewBox.lat, startLng: partyViewBox.lng, pageNum })
-          : await getWorkerPartyDataSet({ startLat: partyViewBox.lat, startLng: partyViewBox.lng, pageNum });
+          : await getWorkerPartyDataSet({
+              startLat: partyViewBox.lat,
+              startLng: partyViewBox.lng,
+              pageNum,
+            });
         setPartyWorkerResults({ ...partyWorkerResults, ...paginatedResult });
         pageNum++;
       }

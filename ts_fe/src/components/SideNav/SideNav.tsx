@@ -13,7 +13,7 @@ import { WORKER_STATUS } from '../../hooks/useWorker';
 import { BATCH_SIZE, type WorkerSizeType } from '../../utils/general';
 // styles
 import './SideNav.scss';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type SideNavProps = {
   multiThreadedCheckedHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -156,11 +156,15 @@ const SideNav = ({
                 partyWorkerHandler?.clickHandler && partyWorkerHandler.clickHandler();
               }
             }}
-            endIcon={partyWorkerStatus === WORKER_STATUS.RUNNING ? <MoodBadIcon /> : <SentimentVerySatisfiedIcon />}
+            endIcon={
+              partyWorkerStatus === WORKER_STATUS.RUNNING ? (
+                <MoodBadIcon />
+              ) : (
+                <SentimentVerySatisfiedIcon />
+              )
+            }
           >
-            {partyWorkerStatus === WORKER_STATUS.RUNNING
-              ? 'End the party...'
-              : 'Party Mode!'}
+            {partyWorkerStatus === WORKER_STATUS.RUNNING ? 'End the party...' : 'Party Mode!'}
           </Button>
           <ListItem>
             <ListItemText

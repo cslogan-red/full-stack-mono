@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import Map, { Marker, type MapLayerTouchEvent, type MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import Map, {
+  Marker,
+  type MapLayerTouchEvent,
+  type MapLayerMouseEvent,
+} from 'react-map-gl/maplibre';
 import MapMarker from '../../assets/mapmarker.svg';
 import AltMapMarker from '../../assets/mapmarker-alt.svg';
 import Screw from '../../assets/screw.svg';
@@ -37,7 +41,6 @@ const MapBox = ({
   startLng,
   boundingBoxHandler,
   renderer = MapBoxRenderers.reactMapGl,
-  isPartyMode,
   latLngMarkerCoords = [],
   longLatLngMarkerCoords = [],
   partyLatLngMarkerCoords = [],
