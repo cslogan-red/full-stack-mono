@@ -5,7 +5,13 @@ import {
   type WorkerDataResponseType,
   type LatLongResponseType,
 } from '../../services/appDataService';
-import { WORKER_SIZE, EXT_START_LAT, EXT_START_LNG, BATCH_SIZE, type WorkerSizeType } from '../../utils/general';
+import {
+  WORKER_SIZE,
+  EXT_START_LAT,
+  EXT_START_LNG,
+  BATCH_SIZE,
+  type WorkerSizeType,
+} from '../../utils/general';
 // components
 import SideNav from '../SideNav/SideNav';
 import MapBox from '../MapBox/MapBox';
@@ -24,8 +30,8 @@ const AppContainer = () => {
   const [isMultiThreaded, setIsMultiThreaded] = useState<boolean>(true);
   const [smallBatchSize, setSmallBatchSize] = useState<number>(BATCH_SIZE.small);
   const [largeBatchSize, setLargeBatchSize] = useState<number>(BATCH_SIZE.large);
-  const getSmBS = () => smallBatchSize > BATCH_SIZE.smallMax ? BATCH_SIZE.small : smallBatchSize;
-  const getLgBS = () => largeBatchSize > BATCH_SIZE.largeMax ? BATCH_SIZE.large : largeBatchSize;
+  const getSmBS = () => (smallBatchSize > BATCH_SIZE.smallMax ? BATCH_SIZE.small : smallBatchSize);
+  const getLgBS = () => (largeBatchSize > BATCH_SIZE.largeMax ? BATCH_SIZE.large : largeBatchSize);
 
   // primary middleware orchestrator
   const workloadHandler = async (size: WorkerSizeType = WORKER_SIZE.small) => {
@@ -84,7 +90,7 @@ const AppContainer = () => {
   const largeItemCountHandler = (size: number) => setLargeBatchSize(size);
 
   return (
-    <div className={'app-container'}>
+    <div className={'app-container'} aria-label={'app-container'}>
       <div className={'app-container--sidenav'}>
         <SideNav
           multiThreadedCheckedHandler={multiThreadedCheckedHandler}

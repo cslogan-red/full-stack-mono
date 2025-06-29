@@ -1,3 +1,5 @@
+@use "colors";
+
 /* heights & widths */
 $app-min-width: 100vw;
 $app-min-height: 100vh;
@@ -18,8 +20,8 @@ $vh-media-x-small: 6vh;
 
 $border-radius: .15rem;
 
-$map-border: .15rem inset $color-dark-gray;
-$nav-border: .1rem inset $color-dark-gray;
+$map-border: .15rem inset colors.$color-dark-gray;
+$nav-border: .1rem inset colors.$color-dark-gray;
 
 /* gutters & spacing */
 $p-xx-small: .25rem;

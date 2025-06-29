@@ -10,7 +10,7 @@ interface JOB_RUNNER_OPTIONS {
  * that executes with the user supplied params of the user function
  * but in the context of a web worker to do the work of the supplied user function
  * sending the results (whether SUCCESS or ERROR) back to the main thread via postMessage
- * 
+ *
  * only meant to be used in web worker context due to reliance on postMessage
  */
 export const workerJobRunner =
