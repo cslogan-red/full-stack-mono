@@ -1,4 +1,6 @@
-@import '../../styles/index.scss';
+@use '../../styles/forms';
+@use '../../styles/colors';
+@use '../../styles/fonts';
 
 .sidenav {
   width: 250px;
@@ -8,32 +10,32 @@
   left: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  border-right: $nav-border;
+  border-right: forms.$nav-border;
   box-shadow: 5px 0 5px rgba(0,0,0,0.1);
-  background-color: $color-heavy-blue;
+  background-color: colors.$color-heavy-blue;
   z-index: 1000;
   &--header {
     min-width: 75px;
     min-height: 30px;
-    margin-bottom: $m-normal;
-    margin-top: $m-xx-small;
+    margin-bottom: forms.$m-normal;
+    margin-top: forms.$m-xx-small;
     display: flex;
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-    font-weight: $font-weight-mid-heavy;
+    font-weight: fonts.$font-weight-mid-heavy;
     >span {
       cursor: inherit;
     }
   }
   &--content {
     background-color: #333333f0;
-    border-top: $nav-border;
-    border-bottom: $nav-border;
+    border-top: forms.$nav-border;
+    border-bottom: forms.$nav-border;
     &-item {
       cursor: pointer;
-      padding: $p-xx-small;
-      padding-left: $p-x-small;
+      padding: forms.$p-xx-small;
+      padding-left: forms.$p-x-small;
       text-transform: uppercase;
       &:hover {
         display: inline-block;
@@ -45,8 +47,8 @@
     &-switch {
       display: flex;
       justify-content: center;
-      margin-bottom: $m-small;
-      padding-top: $p-x-small;
+      margin-bottom: forms.$m-small;
+      padding-top: forms.$p-x-small;
     }
     &-controls {
       display: flex;
@@ -54,10 +56,10 @@
       align-items: center;
       flex-direction: column;
       >button:first-of-type {
-        margin-bottom: $m-small;
+        margin-bottom: forms.$m-small;
       }
       &-input {
-        margin-bottom: $m-x-small;
+        margin-bottom: forms.$m-x-small;
       }
     }
     &-results {
@@ -66,7 +68,7 @@
       flex-direction: column;
       align-content: center;
       align-items: center;
-      margin-top: $m-small;
+      margin-top: forms.$m-small;
     }
   }
 }

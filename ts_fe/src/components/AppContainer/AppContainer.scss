@@ -1,8 +1,8 @@
-@import '../../styles/index.scss';
+@use '../../styles/forms';
 
 .app-container {
-  width: $app-min-width;
-  height: $app-min-height;
+  width: forms.$app-min-width;
+  height: forms.$app-min-height;
   overflow: hidden;
   &--content {
     position: absolute;
