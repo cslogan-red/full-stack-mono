@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import Map, { Marker } from 'react-map-gl/maplibre';
 import MapMarker from '../../assets/mapmarker.svg';
 import AltMapMarker from '../../assets/mapmarker-alt.svg';
-import Screw from '../../assets/screw.svg'
+import Screw from '../../assets/screw.svg';
 import { type LatLongResponseType } from '../../services/appDataService';
+import { VITE_MAP_URL } from '../../constants';
 // styles
 import './MapBox.scss';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -25,7 +26,7 @@ type MapBoxProps = {
 // add to your local .env file in the root of ts_fe:
 // VITE_MAP_URL="https://api.maptiler.com/maps/streets-v2/style.json?key=<your_API_key>"
 // maptiler API keys & signup is free!
-const MAP_URL = import.meta.env.VITE_MAP_URL; 
+const MAP_URL = VITE_MAP_URL;
 
 // simple MapBox component render switching for the purpose of the demo
 const MapBox = ({
@@ -58,14 +59,22 @@ const MapBox = ({
       )),
     [longLatLngMarkerCoords],
   );
-  console.log()
+  console.log();
   return (
-    <div className={'mapbox-container'}>
+    <div className={'mapbox-container'} aria-label={'mapbox-container'}>
       <div className={'mapbox-container--renderer'}>
-      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
-      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
-      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
-      <div className={'mapbox-container--renderer-screw'}><img src={Screw}/></div>
+        <div className={'mapbox-container--renderer-screw'}>
+          <img src={Screw} />
+        </div>
+        <div className={'mapbox-container--renderer-screw'}>
+          <img src={Screw} />
+        </div>
+        <div className={'mapbox-container--renderer-screw'}>
+          <img src={Screw} />
+        </div>
+        <div className={'mapbox-container--renderer-screw'}>
+          <img src={Screw} />
+        </div>
         {renderer === MapBoxRenderers.reactMapGl ? (
           <Map
             initialViewState={{

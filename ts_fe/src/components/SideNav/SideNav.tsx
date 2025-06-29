@@ -52,7 +52,7 @@ const SideNav = ({
     setLargeWorkerStatus(largeWorkerHandler.status);
   }, [smallWorkerHandler.status, largeWorkerHandler.status]);
   return (
-    <div className={'sidenav'}>
+    <div className={'sidenav'} aria-label={'sidenav'}>
       <div className={'sidenav--header'}>
         <span>Map Demo</span>
       </div>
@@ -81,7 +81,9 @@ const SideNav = ({
               error={smallItemCount > BATCH_SIZE.smallMax}
               helperText={smallItemCount > BATCH_SIZE.smallMax ? `Max ${BATCH_SIZE.smallMax}` : ''}
               onChange={(e) => {
-                const val = e.currentTarget?.value ? parseInt(e.currentTarget.value) : BATCH_SIZE.small;
+                const val = e.currentTarget?.value
+                  ? parseInt(e.currentTarget.value)
+                  : BATCH_SIZE.small;
                 if (val > 0) {
                   smallItemCountHandler(val);
                   setSmallItemCount(parseInt(e.currentTarget.value));
@@ -109,7 +111,9 @@ const SideNav = ({
               error={largeItemCount > BATCH_SIZE.largeMax}
               helperText={largeItemCount > BATCH_SIZE.largeMax ? `Max ${BATCH_SIZE.largeMax}` : ''}
               onChange={(e) => {
-                const val = e.currentTarget?.value ? parseInt(e.currentTarget.value) : BATCH_SIZE.large;
+                const val = e.currentTarget?.value
+                  ? parseInt(e.currentTarget.value)
+                  : BATCH_SIZE.large;
                 if (val > 0) {
                   largeItemCountHandler(val);
                   setLargeItemCount(parseInt(e.currentTarget.value));
@@ -135,8 +139,14 @@ const SideNav = ({
             <ListItemText
               primary={
                 <div className={'sidenav--content-results'}>
-                  <div>Small Batch Size: {smallWorkerResults && smallWorkerResults > 0 ? `${smallWorkerResults}` : 'N/A'}</div>
-                  <div>Large Batch Size: {largeWorkerResults && largeWorkerResults > 0 ? `${largeWorkerResults}` : 'N/A'}</div>
+                  <div>
+                    Small Batch Size:{' '}
+                    {smallWorkerResults && smallWorkerResults > 0 ? `${smallWorkerResults}` : 'N/A'}
+                  </div>
+                  <div>
+                    Large Batch Size:{' '}
+                    {largeWorkerResults && largeWorkerResults > 0 ? `${largeWorkerResults}` : 'N/A'}
+                  </div>
                 </div>
               }
             />

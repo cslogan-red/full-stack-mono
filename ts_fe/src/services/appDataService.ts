@@ -24,7 +24,9 @@ export type WorkerDataResponseType = {
 export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
   const { startLat, startLng, batchSize = 25, isSmall } = props;
   const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
-  const result = await fetch(`http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`);
+  const result = await fetch(
+    `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`,
+  );
   const resultJson = await result.json();
   // simulate compute intensive workload on every data hyrdation request
   const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));
@@ -38,7 +40,9 @@ export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDa
  * @param props @WorkerPropsType
  * @returns @WorkerDataResponseType
  */
-export const localWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
+export const localWorkerDataSet = async (
+  props: WorkerPropsType,
+): Promise<WorkerDataResponseType> => {
   const { startLat, startLng, batchSize = 25, isSmall } = props;
   const START_LNG = isSmall ? -122.4 : -122.3;
   const START_LAT = isSmall ? 37.8 : 37.7;
@@ -48,7 +52,7 @@ export const localWorkerDataSet = async (props: WorkerPropsType): Promise<Worker
     results: acc,
     nextToken: { lat: 0, lng: 0 },
   };
-  
+
   return new Promise<WorkerDataResponseType>((resolve) => {
     return setTimeout(() => {
       // calculate the entire possible list based on the input batch size
@@ -56,18 +60,14 @@ export const localWorkerDataSet = async (props: WorkerPropsType): Promise<Worker
       for (let i = 0; i < batchSize; i++) {
         const currentResult = { lat: 0, lng: 0 };
         const latSep =
-          acc.length === 0
-            ? START_LAT * ARC_DEGREE_SEP
-            : acc[i - 1].lat * ARC_DEGREE_SEP;
+          acc.length === 0 ? START_LAT * ARC_DEGREE_SEP : acc[i - 1].lat * ARC_DEGREE_SEP;
         const lngSep =
-          acc.length === 0
-            ? START_LNG * ARC_DEGREE_SEP
-            : acc[i - 1].lng * ARC_DEGREE_SEP;
+          acc.length === 0 ? START_LNG * ARC_DEGREE_SEP : acc[i - 1].lng * ARC_DEGREE_SEP;
 
         currentResult.lat =
-          acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep - (isSmall ? .0025 : 0);
+          acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep - (isSmall ? 0.0025 : 0);
         currentResult.lng =
-          acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall ? .0025 : 0);
+          acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall ? 0.0025 : 0);
         acc.push(currentResult);
       }
       // if the batch size is greater than PAGE_SIZE, handle pagination by searching
@@ -76,16 +76,13 @@ export const localWorkerDataSet = async (props: WorkerPropsType): Promise<Worker
         // n+1 pagination
         const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
         const pageAcc: LatLongResponseType[] = [];
-        for (let i = sI + 1; i < (sI + 1 + PAGE_SIZE); i++) {
+        for (let i = sI + 1; i < sI + 1 + PAGE_SIZE; i++) {
           if (acc[i]) {
             pageAcc.push(acc[i]);
           }
         }
-        console.log(startLat, sI, pageAcc, batchSize)
-        if (
-          pageAcc.length === PAGE_SIZE &&
-          sI * 2 !== batchSize - 2
-        ) {
+        console.log(startLat, sI, pageAcc, batchSize);
+        if (pageAcc.length === PAGE_SIZE && sI * 2 !== batchSize - 2) {
           returnVal.nextToken = pageAcc[pageAcc.length - 1];
           returnVal.results = [...pageAcc];
         } else {
@@ -103,4 +100,4 @@ export const localWorkerDataSet = async (props: WorkerPropsType): Promise<Worker
       resolve(returnVal);
     }, 1000); // Simulating network delay
   });
-}
+};

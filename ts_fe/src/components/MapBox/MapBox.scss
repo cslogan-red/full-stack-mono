@@ -1,4 +1,6 @@
-@import '../../styles/index.scss';
+@use '../../styles/forms';
+@use '../../styles/shadows';
+@use '../../styles/colors';
 
 .mapbox-container {
   height: 100%;
@@ -6,37 +8,37 @@
   &--renderer {
     width: 100%;
     height: 100%;
-    padding: $p-normal $p-large;
-    background-color: $color-heavy-blue;
+    padding: forms.$p-normal forms.$p-large;
+    background-color: colors.$color-heavy-blue;
     &-screw {
       position: absolute;
     }
     &-screw:nth-of-type(1) {
       top: 0;
       right: 0;
-      padding-right: $p-xx-small;
+      padding-right: forms.$p-xx-small;
     }
     &-screw:nth-of-type(2) {
       bottom: 0;
       right: 0;
-      padding-right: $p-xx-small;
+      padding-right: forms.$p-xx-small;
     }
     &-screw:nth-of-type(3) {
       bottom: 0;
       left: 0;
-      padding-left: $p-xx-small;
+      padding-left: forms.$p-xx-small;
     }
     &-screw:nth-of-type(4) {
       top: 0;
       left: 0;
-      padding-left: $p-xx-small;
+      padding-left: forms.$p-xx-small;
     }
     .maplibregl-map {
       width: 100%;
       height: 100%;
-      border: $map-border;
+      border: forms.$map-border;
       border-radius: 1.5rem;
-      box-shadow: $map-shadow;
+      box-shadow: shadows.$map-shadow;
     }
   }
 };
