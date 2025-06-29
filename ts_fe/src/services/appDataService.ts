@@ -1,6 +1,7 @@
 type WorkerPropsType = {
   startLat?: number;
   startLng?: number;
+  pageNum?: number;
   batchSize?: number;
   isSmall?: boolean;
 };
@@ -23,16 +24,53 @@ export type WorkerDataResponseType = {
  */
 export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
   const { startLat, startLng, batchSize = 25, isSmall } = props;
-  const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
-  const result = await fetch(
-    `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`,
-  );
-  const resultJson = await result.json();
-  // simulate compute intensive workload on every data hyrdation request
-  const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));
-  const sortNumbers = (nums: number[]) => nums.sort();
-  sortNumbers(numbers);
-  return resultJson.returnVal;
+  let returnVal = { results: [], nextToken: { lat: 0, lng: 0 } };
+  try {
+    const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
+    const result = await fetch(
+      `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`,
+    );
+    const resultJson = await result.json();
+    returnVal = resultJson.returnVal;
+
+    // simulate compute intensive workload on every data hyrdation request
+    const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));
+    const sortNumbers = (nums: number[]) => nums.sort();
+    sortNumbers(numbers);
+  } catch (ex) {
+    console.error(`Exception in appDataService.getWorkerDataSet::${ex}`);
+  }
+  return returnVal;
+};
+
+/**
+ * Fetch an actual large data set from local node server, simulate complex CPU work on data
+ * In single-threaded (UI thread) mode this will result in UI chug and stuttering, while
+ * mulit-threaded requests pushed to Workers through useWorker hook continue to process separately
+ * passing data back to the main thread in pages as it becomes available for a smooth UI experience
+ * @param props @WorkerPropsType
+ * @returns @WorkerDataResponseType
+ */
+export const getWorkerPartyDataSet = async (
+  props: WorkerPropsType,
+): Promise<WorkerDataResponseType> => {
+  const { startLat, startLng, pageNum } = props;
+  let returnVal = { results: [], nextToken: { lat: 0, lng: 0 } };
+  try {
+    const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
+    const pageNumStr = pageNum ? `&pageNum=${pageNum}` : '';
+    const result = await fetch(`http://localhost:5173/local/api/v1/latlng/party?${endStr}${pageNumStr}`);
+    const resultJson = await result.json();
+    returnVal = resultJson.returnVal;
+
+    // simulate compute intensive workload on every data hyrdation request
+    const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));
+    const sortNumbers = (nums: number[]) => nums.sort();
+    sortNumbers(numbers);
+  } catch (ex) {
+    console.error(`Exception in appDataService.getWorkerDataSet::${ex}`);
+  }
+  return returnVal;
 };
 
 /**

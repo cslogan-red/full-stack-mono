@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import Map, { Marker } from 'react-map-gl/maplibre';
+import Map, { Marker, type MapLayerTouchEvent, type MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import MapMarker from '../../assets/mapmarker.svg';
 import AltMapMarker from '../../assets/mapmarker-alt.svg';
 import Screw from '../../assets/screw.svg';
@@ -18,8 +18,11 @@ export type MapBoxRenderersType = (typeof MapBoxRenderers)[keyof typeof MapBoxRe
 type MapBoxProps = {
   startLat: number;
   startLng: number;
+  boundingBoxHandler?: (latlng: LatLongResponseType) => void;
   latLngMarkerCoords?: LatLongResponseType[];
   longLatLngMarkerCoords?: LatLongResponseType[];
+  partyLatLngMarkerCoords?: LatLongResponseType[];
+  isPartyMode?: boolean;
   renderer?: MapBoxRenderersType;
 };
 
@@ -32,9 +35,12 @@ const MAP_URL = VITE_MAP_URL;
 const MapBox = ({
   startLat,
   startLng,
+  boundingBoxHandler,
   renderer = MapBoxRenderers.reactMapGl,
+  isPartyMode,
   latLngMarkerCoords = [],
   longLatLngMarkerCoords = [],
+  partyLatLngMarkerCoords = [],
 }: MapBoxProps) => {
   // track results as they stream in from background worker threads
   const markers = useMemo(
@@ -59,11 +65,21 @@ const MapBox = ({
       )),
     [longLatLngMarkerCoords],
   );
-  console.log();
+  const partyMarkers = useMemo(
+    () =>
+      partyLatLngMarkerCoords.map((coords, i) => (
+        <Marker key={`${coords.lat}-m`} longitude={coords.lng} latitude={coords.lat}>
+          <div key={`${coords.lat}-d`} className={'marker'}>
+            <img key={`${coords.lat}-i`} src={i % 2 === 0 ? MapMarker : AltMapMarker} />
+          </div>
+        </Marker>
+      )),
+    [longLatLngMarkerCoords],
+  );
   return (
     <div className={'mapbox-container'} aria-label={'mapbox-container'}>
       <div className={'mapbox-container--renderer'}>
-        <div className={'mapbox-container--renderer-screw'}>
+        <div className={'mapbox-container--renderer-screw'} aria-label={'mapbox-container-screw'}>
           <img src={Screw} />
         </div>
         <div className={'mapbox-container--renderer-screw'}>
@@ -84,8 +100,18 @@ const MapBox = ({
             }}
             mapStyle={MAP_URL}
             mapLib={import('maplibre-gl')}
+            onMouseUp={(e: MapLayerMouseEvent) => {
+              if (boundingBoxHandler) {
+                boundingBoxHandler({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+              }
+            }}
+            onTouchEnd={(e: MapLayerTouchEvent) => {
+              if (boundingBoxHandler) {
+                boundingBoxHandler({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+              }
+            }}
           >
-            {[...markers, ...longMarkers]}
+            {[...markers, ...longMarkers, ...partyMarkers]}
           </Map>
         ) : (
           <span>Invalid mapbox renderer selected, please try again.</span>

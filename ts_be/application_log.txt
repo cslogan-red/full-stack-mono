@@ -1,2 +1,2 @@
-[2025-06-28T16:32:09.300Z] [WARN] Test file log message with level
-[2025-06-28T16:32:09.300Z] [INFO] Test file log message with level
+[2025-06-29T19:28:24.980Z] [WARN] Test file log message with level
+[2025-06-29T19:28:24.980Z] [INFO] Test file log message with level

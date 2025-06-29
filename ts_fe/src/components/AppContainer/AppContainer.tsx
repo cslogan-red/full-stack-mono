@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWorker } from '../../hooks';
 import {
   getWorkerDataSet,
+  getWorkerPartyDataSet,
   type WorkerDataResponseType,
   type LatLongResponseType,
 } from '../../services/appDataService';
@@ -23,13 +24,23 @@ const AppContainer = () => {
     useWorker(getWorkerDataSet);
   const [largeWorker, { status: largeWorkerStatus, kill: largeWorkerKill }] =
     useWorker(getWorkerDataSet);
+  const [partyWorker, { status: partyWorkerStatus, kill: partyWorkerKill }] =
+    useWorker(getWorkerPartyDataSet);
   const [workerResults, setWorkerResults] = useState<WorkerDataResponseType | undefined>(undefined);
   const [longWorkerResults, setLongWorkerResults] = useState<WorkerDataResponseType | undefined>(
+    undefined,
+  );
+  const [partyWorkerResults, setPartyWorkerResults] = useState<WorkerDataResponseType | undefined>(
     undefined,
   );
   const [isMultiThreaded, setIsMultiThreaded] = useState<boolean>(true);
   const [smallBatchSize, setSmallBatchSize] = useState<number>(BATCH_SIZE.small);
   const [largeBatchSize, setLargeBatchSize] = useState<number>(BATCH_SIZE.large);
+  const [partyViewBox, setPartyViewBox] = useState<LatLongResponseType>({
+    lat: EXT_START_LAT,
+    lng: EXT_START_LNG,
+  });
+  const [isPartyMode, setPartyMode] = useState<boolean>(false);
   const getSmBS = () => (smallBatchSize > BATCH_SIZE.smallMax ? BATCH_SIZE.small : smallBatchSize);
   const getLgBS = () => (largeBatchSize > BATCH_SIZE.largeMax ? BATCH_SIZE.large : largeBatchSize);
 
@@ -74,6 +85,34 @@ const AppContainer = () => {
       if (isLargeWorker) setLongWorkerResults({ ...result });
     }
   };
+  // party handler!
+  const partyWorkloadHandler = async () => {
+    const isMT = isMultiThreaded;
+    const result = isMT
+      ? await partyWorker({ startLat: partyViewBox.lat, startLng: partyViewBox.lng })
+      : await getWorkerPartyDataSet({ startLat: partyViewBox.lat, startLng: partyViewBox.lng });
+    if (result.nextToken.lat > 0) {
+      let pageNum = 1;
+      // handle paginated results multi or single threaded
+      setPartyWorkerResults({ ...result });
+      setPartyMode(!isPartyMode);
+      let paginatedResult = {
+        results: [] as LatLongResponseType[],
+        nextToken: { ...result.nextToken },
+      };
+      while (paginatedResult.nextToken.lat > 0) {
+        paginatedResult = isMT
+          ? await partyWorker({ startLat: partyViewBox.lat, startLng: partyViewBox.lng, pageNum })
+          : await getWorkerPartyDataSet({ startLat: partyViewBox.lat, startLng: partyViewBox.lng, pageNum });
+        setPartyWorkerResults({ ...partyWorkerResults, ...paginatedResult });
+        pageNum++;
+      }
+    } else {
+      setPartyWorkerResults({ ...result });
+      setPartyMode(!isPartyMode);
+    }
+  };
+
   // nav handlers
   const multiThreadedCheckedHandler = () => setIsMultiThreaded(!isMultiThreaded);
   const smallWorkerHandler = {
@@ -86,8 +125,16 @@ const AppContainer = () => {
     kill: largeWorkerKill,
     clickHandler: workloadHandler,
   };
+  const partyWorkerHandler = {
+    status: partyWorkerStatus,
+    kill: partyWorkerKill,
+    clickHandler: partyWorkloadHandler,
+  };
   const smallItemCountHandler = (size: number) => setSmallBatchSize(size);
   const largeItemCountHandler = (size: number) => setLargeBatchSize(size);
+  const boundingBoxHandler = (latlng: LatLongResponseType) => {
+    setPartyViewBox({ ...latlng });
+  };
 
   return (
     <div className={'app-container'} aria-label={'app-container'}>
@@ -96,6 +143,7 @@ const AppContainer = () => {
           multiThreadedCheckedHandler={multiThreadedCheckedHandler}
           smallWorkerHandler={smallWorkerHandler}
           largeWorkerHandler={largeWorkerHandler}
+          partyWorkerHandler={partyWorkerHandler}
           smallWorkerResults={workerResults?.results?.length}
           largeWorkerResults={longWorkerResults?.results?.length}
           smallItemCountHandler={smallItemCountHandler}
@@ -103,12 +151,15 @@ const AppContainer = () => {
         />
       </div>
       <div className={'app-container--content'}>
-        <div className={'app-container--content-body'}>
+        <div className={'app-container--content-body'} aria-label={'app-container-map'}>
           <MapBox
             startLat={EXT_START_LAT}
             startLng={EXT_START_LNG}
+            boundingBoxHandler={boundingBoxHandler}
             latLngMarkerCoords={workerResults?.results}
             longLatLngMarkerCoords={longWorkerResults?.results}
+            partyLatLngMarkerCoords={partyWorkerResults?.results}
+            isPartyMode={isPartyMode}
           />
         </div>
       </div>

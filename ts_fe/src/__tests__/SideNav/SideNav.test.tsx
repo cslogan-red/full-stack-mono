@@ -1,17 +1,17 @@
-import { render, cleanup } from '@testing-library/react';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 import SideNav from '../../components/SideNav/SideNav';
 
 // mock vite meta imports until better solution
 jest.mock('../../constants', () => ({
-  VITE_MAP_URL: 'localhost',
+  VITE_MAP_URL: 'test',
 }));
 
-describe('MapBox tests', () => {
+describe('SideNav tests', () => {
   // setup/cleanup
   afterEach(cleanup);
-  it('SideNav can render without error', () => {
+  it('can render SideNav without error', () => {
     const handler = () => {};
-    const { queryByLabelText } = render(
+    const { queryByLabelText, getByLabelText } = render(
       <SideNav
         multiThreadedCheckedHandler={handler}
         smallItemCountHandler={handler}
@@ -30,9 +30,9 @@ describe('MapBox tests', () => {
         largeWorkerResults={undefined}
       />,
     );
-    expect(queryByLabelText(/sidenav/i)).toBeTruthy();
+    expect(queryByLabelText('sidenav-container')).toBeTruthy();
 
-    //fireEvent.click(getByLabelText(/off/i));
-    //expect(queryByLabelText(/on/i)).toBeTruthy();
+    fireEvent.click(getByLabelText('sidenav--content-switch'));
+    expect(queryByLabelText('sidenav--content-switch')).toBeDefined();
   });
 });
