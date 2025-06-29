@@ -26,6 +26,11 @@ describe('SideNav tests', () => {
           status: '',
           clickHandler: handler,
         }}
+        partyWorkerHandler={{
+          kill: handler,
+          status: '',
+          clickHandler: handler,
+        }}
         smallWorkerResults={undefined}
         largeWorkerResults={undefined}
       />,
