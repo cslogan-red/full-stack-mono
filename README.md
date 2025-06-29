@@ -38,3 +38,5 @@ VITE_MAP_URL="https://api.maptiler.com/maps/streets-v2/style.json?key=<REPLACE_Y
 ### You'll now have the full-stack app running locally that you can hit at http://localhost:5173, give it try!
 
 ![Demo Screenshot](ts_fe/src/assets/demo_ui.png?raw=true "Map Demo")
+
+![Demo Movie](ts_fe/src/assets/ui_demo.gif?raw=true "Map Demo")

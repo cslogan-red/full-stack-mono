@@ -7,11 +7,13 @@ import {
   FormControlLabel,
   TextField,
 } from '@mui/material';
+import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
+import MoodBadIcon from '@mui/icons-material/MoodBad';
 import { WORKER_STATUS } from '../../hooks/useWorker';
 import { BATCH_SIZE, type WorkerSizeType } from '../../utils/general';
 // styles
 import './SideNav.scss';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 type SideNavProps = {
   multiThreadedCheckedHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -27,6 +29,11 @@ type SideNavProps = {
     kill: Function;
     clickHandler: (size: WorkerSizeType) => void;
   };
+  partyWorkerHandler: {
+    status: string;
+    kill: Function;
+    clickHandler: () => void;
+  };
   smallWorkerResults: number | undefined;
   largeWorkerResults: number | undefined;
 };
@@ -37,22 +44,26 @@ const SideNav = ({
   largeItemCountHandler,
   smallWorkerHandler,
   largeWorkerHandler,
+  partyWorkerHandler,
   smallWorkerResults,
   largeWorkerResults,
 }: SideNavProps) => {
   const [multiThreadedChecked, setMultiThreadedChecked] = useState(true);
   const [smallItemCount, setSmallItemCount] = useState(BATCH_SIZE.small);
   const [largeItemCount, setLargeItemCount] = useState(BATCH_SIZE.large);
-  const [smallWorkerStatus, setSmallWorkerStatus] = useState(smallWorkerHandler.status);
-  const [largeWorkerStatus, setLargeWorkerStatus] = useState(largeWorkerHandler.status);
+  const [smallWorkerStatus, setSmallWorkerStatus] = useState(smallWorkerHandler?.status ?? '');
+  const [largeWorkerStatus, setLargeWorkerStatus] = useState(largeWorkerHandler?.status ?? '');
+  const [partyWorkerStatus, setPartyWorkerStatus] = useState(partyWorkerHandler?.status ?? '');
   useEffect(() => {
-    console.log('Small Worker Status:', smallWorkerHandler.status);
-    console.log('Large Worker Status:', largeWorkerHandler.status);
-    setSmallWorkerStatus(smallWorkerHandler.status);
-    setLargeWorkerStatus(largeWorkerHandler.status);
-  }, [smallWorkerHandler.status, largeWorkerHandler.status]);
+    console.log('Small Worker Status:', smallWorkerHandler?.status);
+    console.log('Large Worker Status:', largeWorkerHandler?.status);
+    console.log('Party Worker Status:', partyWorkerHandler?.status);
+    setSmallWorkerStatus(smallWorkerHandler?.status);
+    setLargeWorkerStatus(largeWorkerHandler?.status);
+    setPartyWorkerStatus(partyWorkerHandler?.status);
+  }, [smallWorkerHandler?.status, largeWorkerHandler?.status, partyWorkerHandler?.status]);
   return (
-    <div className={'sidenav'} aria-label={'sidenav'}>
+    <div className={'sidenav'} aria-label={'sidenav-container'}>
       <div className={'sidenav--header'}>
         <span>Map Demo</span>
       </div>
@@ -68,6 +79,7 @@ const SideNav = ({
                     setMultiThreadedChecked(!multiThreadedChecked);
                     multiThreadedCheckedHandler(e);
                   }}
+                  aria-label={'sidenav--content-switch'}
                 />
               }
               label="Mutli-Threaded?"
@@ -134,6 +146,21 @@ const SideNav = ({
             {largeWorkerStatus === WORKER_STATUS.RUNNING
               ? 'Kill Large Worker'
               : 'Start Large Worker'}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (partyWorkerStatus === WORKER_STATUS.RUNNING) {
+                partyWorkerHandler.kill && partyWorkerHandler.kill();
+              } else {
+                partyWorkerHandler?.clickHandler && partyWorkerHandler.clickHandler();
+              }
+            }}
+            endIcon={partyWorkerStatus === WORKER_STATUS.RUNNING ? <MoodBadIcon /> : <SentimentVerySatisfiedIcon />}
+          >
+            {partyWorkerStatus === WORKER_STATUS.RUNNING
+              ? 'End the party...'
+              : 'Party Mode!'}
           </Button>
           <ListItem>
             <ListItemText

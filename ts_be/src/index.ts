@@ -1,5 +1,5 @@
 import { ProxyClient } from "./clients/proxyClient";
-import { WebServerClient } from "./clients/webServerClient";
+import { WebServerClient, ROUTER } from "./clients/webServerClient";
 import { LoggingHelper } from "./helpers/loggingHelper";
 
 // Entry point for the application
@@ -18,9 +18,15 @@ export const entryPoint = async () => {
   // Basic web server client of port 4001
   const webServerClient = new WebServerClient("http://localhost:4001");
 
+  // establish basic routes
   webServerClient
-    .get("/api/v1/latlng")
-    .then((data) => console.log("Data from web server:", data))
+    .getAPIV1LatLng(ROUTER.apiV1LatLng)
+    .then((data) => console.log(`GET ${ROUTER.apiV1LatLng}: ${data}`))
+    .catch((err) => console.error("Error fetching data:", err));
+
+  webServerClient
+    .getAPIV1LatLngParty(ROUTER.apiV1LatLngParty)
+    .then((data) => console.log(`GET ${ROUTER.apiV1LatLngParty}: ${data}`))
     .catch((err) => console.error("Error fetching data:", err));
 };
 

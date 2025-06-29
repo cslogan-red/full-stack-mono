@@ -51,30 +51,107 @@ export const getLatLng = async (
         : acc[i - 1].lng * ARC_DEGREE_SEP;
 
     currentResult.lat =
-      acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep - (isSmall === "true" ? .0025 : 0);
+      acc.length === 0
+        ? START_LAT - latSep
+        : acc[i - 1].lat + latSep - (isSmall === "true" ? 0.0025 : 0);
     currentResult.lng =
-      acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall === "true" ? .0025 : 0);
+      acc.length === 0
+        ? START_LNG - lngSep
+        : acc[i - 1].lng + lngSep - (isSmall === "true" ? 0.0025 : 0);
     acc.push(currentResult);
   }
-  // if the batch size is greater than PAGE_SIZE, handle pagination by searching
-  // for window within complete list of options
+  // paginate based on PAGE_SIZE
   if (startLat && startLng) {
     // n+1 pagination
     const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
-    const pageAcc: LatLongType[] = [];
-    for (let i = sI + 1; i < (sI + 1 + PAGE_SIZE); i++) {
-      if (acc[i]) {
-        pageAcc.push(acc[i]);
-      }
-    }
-    console.log(startLat, sI, pageAcc, batchSize)
-    if (
-      pageAcc.length === PAGE_SIZE &&
-      sI * 2 !== parseInt(batchSize as string) - 2
-    ) {
-      returnVal.nextToken = pageAcc[pageAcc.length - 1];
+    const pageAcc: LatLongType[] = [...acc.slice(sI + 1, sI + PAGE_SIZE)];
+    if (sI + PAGE_SIZE >= acc.length) {
       returnVal.results = [...pageAcc];
     } else {
+      returnVal.nextToken = pageAcc[pageAcc.length - 1];
+      returnVal.results = [...pageAcc];
+    }
+  } else {
+    // first page, possible pagination
+    if (acc.length <= PAGE_SIZE) {
+      returnVal.results = [...acc];
+    } else {
+      returnVal.results = [...acc.slice(0, PAGE_SIZE)];
+      returnVal.nextToken = acc[PAGE_SIZE - 1];
+    }
+  }
+  return returnVal;
+};
+
+// randomized view box results based on given input coords, party mode!
+export const getLatLngParty = async (
+  props: LatLongRequestType,
+): Promise<LatLongResponseType> => {
+  const query = props?.req?.query;
+  const acc: LatLongType[] = [];
+  const returnVal = {
+    results: acc,
+    nextToken: { lat: 0, lng: 0 },
+  };
+  const batchSize = 1000;
+  const PAGE_SIZE = 100;
+  const { startLat, startLng, pageNum } = query;
+  const START_LNG = startLng ? parseFloat(startLng as string) : -122.4;
+  const START_LAT = startLat ? parseFloat(startLat as string) : 37.8;
+  // calculate the entire possible list based on the input batch size
+  for (let i = 0; i < batchSize; i++) {
+    const ARC_OFFSET = parseInt(`${Math.random() / 1000000}`.charAt(0));
+    const ARC_DEGREE_SEP = Number(`0.00000${ARC_OFFSET}`);
+    const currentResult = { lat: 0, lng: 0 };
+    const latSep =
+      acc.length === 0
+        ? START_LAT * ARC_DEGREE_SEP
+        : acc[i - 1].lat * ARC_DEGREE_SEP;
+    const lngSep =
+      acc.length === 0
+        ? START_LNG * ARC_DEGREE_SEP
+        : acc[i - 1].lng * ARC_DEGREE_SEP;
+
+    currentResult.lat =
+      acc.length === 0 ? START_LAT - latSep : acc[i - 1].lat + latSep;
+    currentResult.lng =
+      acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep;
+    acc.push(currentResult);
+  }
+  // randomize locations and then the list itself
+  acc
+    .reduce((acc, val, i) => {
+      const offset = parseInt(`${Math.random() / 1000000}`.charAt(0));
+      const ARC_DEGREE_SEP = Number(`0.00000${offset}`);
+      val.lat = parseFloat(
+        Number(
+          i % 2 === 0
+            ? val.lat + offset * ARC_DEGREE_SEP
+            : val.lat - offset * ARC_DEGREE_SEP,
+        ).toPrecision(6),
+      );
+      val.lng = parseFloat(
+        Number(
+          i % 2 === 0
+            ? val.lng - offset * ARC_DEGREE_SEP
+            : val.lng + offset * ARC_DEGREE_SEP,
+        ).toPrecision(6),
+      );
+      acc.push(val);
+      return acc;
+    }, [] as LatLongType[])
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+  // paginate based on PAGE_SIZE
+  if (pageNum) {
+    // n+1 pagination
+    const sI = parseInt(pageNum as string) * PAGE_SIZE;
+    const pageAcc: LatLongType[] = [...acc.slice(sI, sI + PAGE_SIZE)];
+    if (sI + PAGE_SIZE >= acc.length) {
+      returnVal.results = [...pageAcc];
+    } else {
+      returnVal.nextToken = pageAcc[pageAcc.length - 1];
       returnVal.results = [...pageAcc];
     }
   } else {

@@ -58,6 +58,9 @@
       >button:first-of-type {
         margin-bottom: forms.$m-small;
       }
+      >button:last-of-type {
+        margin-top: forms.$m-small;
+      }
       &-input {
         margin-bottom: forms.$m-x-small;
       }

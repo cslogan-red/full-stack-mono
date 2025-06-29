@@ -3,17 +3,19 @@ import AppContainer from '../../components/AppContainer/AppContainer';
 
 // mock vite meta imports until better solution
 jest.mock('../../constants', () => ({
-  VITE_MAP_URL: 'localhost',
+  VITE_MAP_URL: 'test',
 }));
 
 describe('AppContainer tests', () => {
   // setup/cleanup
   afterEach(cleanup);
-  it('AppContainer can render without error', () => {
+  it('can render AppContainer without error', () => {
     const { queryByLabelText } = render(<AppContainer />);
-    expect(queryByLabelText(/app-container/i)).toBeTruthy();
+    expect(queryByLabelText('app-container')).toBeTruthy();
+  });
 
-    //fireEvent.click(getByLabelText(/off/i));
-    //expect(queryByLabelText(/on/i)).toBeTruthy();
+  it('can render AppContainer map without error', () => {
+    const { queryByLabelText } = render(<AppContainer />);
+    expect(queryByLabelText('app-container-map')).toBeTruthy();
   });
 });

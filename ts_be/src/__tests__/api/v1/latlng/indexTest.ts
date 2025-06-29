@@ -4,7 +4,7 @@
  */
 import { Request } from "express";
 import { describe, expect, it } from "@jest/globals";
-import { getLatLng } from "../../../../api/v1/latlng";
+import { getLatLng, getLatLngParty } from "../../../../api/v1/latlng";
 import { setupTestData } from "../../../testData";
 
 describe("Application Entry Point", () => {
@@ -67,6 +67,11 @@ describe("Application Entry Point", () => {
   it("should initialize api/v1/latlng/getLatLng without errors", async () => {
     await expect(
       getLatLng({ req: { query: {}, header: {} } as Request }),
+    ).resolves.not.toThrow();
+  });
+  it("should initialize api/v1/latlng/getLatLngParty without errors", async () => {
+    await expect(
+      getLatLngParty({ req: { query: {}, header: {} } as Request }),
     ).resolves.not.toThrow();
   });
 });

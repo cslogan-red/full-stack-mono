@@ -1,12 +1,17 @@
 // node express web server client
 import express from "express";
 import { Server, IncomingMessage, ServerResponse } from "http";
-import { getLatLng } from "../api/v1/latlng";
+import { getLatLng, getLatLngParty } from "../api/v1/latlng";
 import { LoggingHelper } from "../helpers/loggingHelper";
 
 enum WebServerClientPorts {
   HTTP = 4001, // Default port for HTTP server
 }
+
+export const ROUTER = {
+  apiV1LatLng: "/api/v1/latlng",
+  apiV1LatLngParty: "/api/v1/latlng/party",
+};
 
 /**
  * A minimal Node.js Express webserver, example usage:
@@ -57,8 +62,8 @@ export class WebServerClient {
     }
   }
 
-  // Method to send a GET request
-  public async get(endpoint: string): Promise<Express.Response> {
+  // GET api/v1/latlng
+  public async getAPIV1LatLng(endpoint: string): Promise<Express.Response> {
     return this.app.get(endpoint, async (req, res) => {
       try {
         const returnVal = await getLatLng({ req });
@@ -68,7 +73,33 @@ export class WebServerClient {
           timestamp: new Date().toISOString(),
         });
       } catch (ex) {
-        LoggingHelper.getInstance().error(`Error processing getLatLng: ${ex}`);
+        LoggingHelper.getInstance().error(
+          `Error processing getAPIV1LatLng: ${ex}`,
+        );
+        res.status(500).json({
+          message: `Internal server error`,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
+  }
+
+  // GET api/v1/latlng/party
+  public async getAPIV1LatLngParty(
+    endpoint: string,
+  ): Promise<Express.Response> {
+    return this.app.get(endpoint, async (req, res) => {
+      try {
+        const returnVal = await getLatLngParty({ req });
+        res.json({
+          message: `Hello from the Express server at ${req.path}!`,
+          returnVal,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (ex) {
+        LoggingHelper.getInstance().error(
+          `Error processing getAPIV1LatLngParty: ${ex}`,
+        );
         res.status(500).json({
           message: `Internal server error`,
           timestamp: new Date().toISOString(),

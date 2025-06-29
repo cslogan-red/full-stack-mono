@@ -60,8 +60,15 @@ describe("WebServerClient", () => {
   });
 
   it("should respond to GET requests", async () => {
-    const endpoint = "/api/test";
-    const resp = await webServerClient.get(endpoint);
+    const endpoint = "/api/v1/latlng";
+    const resp = await webServerClient.getAPIV1LatLng(endpoint);
+
+    expect(resp).toBeDefined();
+  });
+
+  it("should respond to GET requests", async () => {
+    const endpoint = "/api/v1/latlng/party";
+    const resp = await webServerClient.getAPIV1LatLngParty(endpoint);
 
     expect(resp).toBeDefined();
   });
