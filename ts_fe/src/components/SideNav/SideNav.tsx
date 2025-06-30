@@ -10,7 +10,7 @@ import {
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import { WORKER_STATUS } from '../../hooks/useWorker';
-import { BATCH_SIZE, type WorkerSizeType } from '../../utils/general';
+import { BATCH_SIZE } from '../../utils/general';
 // styles
 import './SideNav.scss';
 import { useEffect, useState } from 'react';
@@ -22,12 +22,12 @@ type SideNavProps = {
   smallWorkerHandler: {
     status: string;
     kill: Function;
-    clickHandler: (size: WorkerSizeType) => void;
+    clickHandler: () => void;
   };
   largeWorkerHandler: {
     status: string;
     kill: Function;
-    clickHandler: (size: WorkerSizeType) => void;
+    clickHandler: () => void;
   };
   partyWorkerHandler: {
     status: string;
@@ -109,7 +109,7 @@ const SideNav = ({
               if (smallWorkerStatus === WORKER_STATUS.RUNNING) {
                 smallWorkerHandler.kill && smallWorkerHandler.kill();
               } else {
-                smallWorkerHandler?.clickHandler && smallWorkerHandler.clickHandler('small');
+                smallWorkerHandler?.clickHandler && smallWorkerHandler.clickHandler();
               }
             }}
           >
@@ -139,7 +139,7 @@ const SideNav = ({
               if (largeWorkerStatus === WORKER_STATUS.RUNNING) {
                 largeWorkerHandler.kill && largeWorkerHandler.kill();
               } else {
-                largeWorkerHandler?.clickHandler && largeWorkerHandler.clickHandler('large');
+                largeWorkerHandler?.clickHandler && largeWorkerHandler.clickHandler();
               }
             }}
           >

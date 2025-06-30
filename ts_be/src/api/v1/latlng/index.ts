@@ -33,12 +33,14 @@ export const getLatLng = async (
     results: acc,
     nextToken: { lat: 0, lng: 0 },
   };
-  const { startLat, startLng, batchSize = 25, isSmall } = query;
-  const START_LNG = isSmall === "true" ? -122.4 : -122.3;
-  const START_LAT = isSmall === "true" ? 37.8 : 37.7;
+  const { startLat, startLng, batchSize = 25, isSmall, pageNum } = query;
+  const START_LNG =
+    isSmall === "true" ? Number(`${startLng}`) - 0.05 : Number(`${startLng}`);
+  const START_LAT =
+    isSmall === "true" ? Number(`${startLat}`) - 0.05 : Number(`${startLat}`);
   const PAGE_SIZE = 25;
   // calculate the entire possible list based on the input batch size
-  const ARC_DEGREE_SEP = isSmall ? 0.000015 : 0.00001;
+  const ARC_DEGREE_SEP = isSmall ? 0.000012 : 0.00001;
   for (let i = 0; i < parseInt(batchSize as string); i++) {
     const currentResult = { lat: 0, lng: 0 };
     const latSep =
@@ -53,19 +55,20 @@ export const getLatLng = async (
     currentResult.lat =
       acc.length === 0
         ? START_LAT - latSep
-        : acc[i - 1].lat + latSep - (isSmall === "true" ? 0.0025 : 0);
+        : acc[i - 1].lat + latSep - (isSmall === "true" ? 0.001 : 0);
     currentResult.lng =
       acc.length === 0
         ? START_LNG - lngSep
-        : acc[i - 1].lng + lngSep - (isSmall === "true" ? 0.0025 : 0);
+        : acc[i - 1].lng + lngSep - (isSmall === "true" ? 0.001 : 0);
     acc.push(currentResult);
   }
   // paginate based on PAGE_SIZE
-  if (startLat && startLng) {
+  if (pageNum) {
     // n+1 pagination
-    const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
-    const pageAcc: LatLongType[] = [...acc.slice(sI + 1, sI + PAGE_SIZE)];
+    const sI = parseInt(pageNum as string) * PAGE_SIZE;
+    const pageAcc: LatLongType[] = [...acc.slice(sI, sI + PAGE_SIZE)];
     if (sI + PAGE_SIZE >= acc.length) {
+      returnVal.nextToken = { lat: 0, lng: 0 };
       returnVal.results = [...pageAcc];
     } else {
       returnVal.nextToken = pageAcc[pageAcc.length - 1];
@@ -100,8 +103,7 @@ export const getLatLngParty = async (
   const START_LAT = startLat ? parseFloat(startLat as string) : 37.8;
   // calculate the entire possible list based on the input batch size
   for (let i = 0; i < batchSize; i++) {
-    const ARC_OFFSET = parseInt(`${Math.random() / 1000000}`.charAt(0));
-    const ARC_DEGREE_SEP = Number(`0.00000${ARC_OFFSET}`);
+    const ARC_DEGREE_SEP = 0.000001;
     const currentResult = { lat: 0, lng: 0 };
     const latSep =
       acc.length === 0
@@ -122,26 +124,32 @@ export const getLatLngParty = async (
   acc
     .reduce((acc, val, i) => {
       const offset = parseInt(`${Math.random() / 1000000}`.charAt(0));
-      const ARC_DEGREE_SEP =
+      const ARC_DEGREE_SEP_LAT =
+        i % 7 === 0
+          ? Number(`0.00${offset}`)
+          : i % 9 === 0
+            ? Number(`0.03${offset}`)
+            : Number(`0.008${offset}`);
+      const ARC_DEGREE_SEP_LNG =
         i % 5 === 0
           ? Number(`0.0000${offset}`)
           : i % 4 === 0
             ? Number(`0.000${offset}`)
             : i % 2 === 0
               ? Number(`0.00000${offset}`)
-              : Number(`0.00000${offset}`);
+              : Number(`0.00003${offset}`);
       val.lat = parseFloat(
         Number(
           i % 2 === 0
-            ? val.lat + offset * ARC_DEGREE_SEP
-            : val.lat - offset * ARC_DEGREE_SEP,
+            ? val.lat + offset * ARC_DEGREE_SEP_LAT
+            : val.lat - offset * ARC_DEGREE_SEP_LAT,
         ).toPrecision(6),
       );
       val.lng = parseFloat(
         Number(
           i % 2 === 0
-            ? val.lng - offset * ARC_DEGREE_SEP
-            : val.lng + offset * ARC_DEGREE_SEP,
+            ? val.lng - offset * ARC_DEGREE_SEP_LNG
+            : val.lng + offset * ARC_DEGREE_SEP_LNG,
         ).toPrecision(6),
       );
       acc.push(val);

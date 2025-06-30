@@ -23,12 +23,13 @@ export type WorkerDataResponseType = {
  * @returns @WorkerDataResponseType
  */
 export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
-  const { startLat, startLng, batchSize = 25, isSmall } = props;
+  const { startLat, startLng, batchSize = 25, isSmall, pageNum } = props;
   let returnVal = { results: [], nextToken: { lat: 0, lng: 0 } };
   try {
     const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
+    const pageNumStr = pageNum ? `&pageNum=${pageNum}` : '';
     const result = await fetch(
-      `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}`,
+      `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}${pageNumStr}`,
     );
     const resultJson = await result.json();
     returnVal = resultJson.returnVal;
@@ -83,9 +84,9 @@ export const getWorkerPartyDataSet = async (
 export const localWorkerDataSet = async (
   props: WorkerPropsType,
 ): Promise<WorkerDataResponseType> => {
-  const { startLat, startLng, batchSize = 25, isSmall } = props;
-  const START_LNG = isSmall ? -122.4 : -122.3;
-  const START_LAT = isSmall ? 37.8 : 37.7;
+  const { startLat, startLng, batchSize = 25, isSmall, pageNum } = props;
+  const START_LNG = isSmall ? Number(`${startLng}`) - 0.1 : Number(`${startLng}`);
+  const START_LAT = isSmall ? Number(`${startLat}`) - 0.1 : Number(`${startLat}`);
   const PAGE_SIZE = 25;
   const acc: LatLongResponseType[] = [];
   const returnVal = {
@@ -110,22 +111,16 @@ export const localWorkerDataSet = async (
           acc.length === 0 ? START_LNG - lngSep : acc[i - 1].lng + lngSep - (isSmall ? 0.0025 : 0);
         acc.push(currentResult);
       }
-      // if the batch size is greater than PAGE_SIZE, handle pagination by searching
-      // for window within complete list of options
-      if (startLat && startLng) {
+      // paginate based on PAGE_SIZE
+      if (pageNum) {
         // n+1 pagination
-        const sI = acc.findIndex((val) => `${val.lat}` === `${startLat}`);
-        const pageAcc: LatLongResponseType[] = [];
-        for (let i = sI + 1; i < sI + 1 + PAGE_SIZE; i++) {
-          if (acc[i]) {
-            pageAcc.push(acc[i]);
-          }
-        }
-        console.log(startLat, sI, pageAcc, batchSize);
-        if (pageAcc.length === PAGE_SIZE && sI * 2 !== batchSize - 2) {
-          returnVal.nextToken = pageAcc[pageAcc.length - 1];
+        const sI = pageNum * PAGE_SIZE;
+        const pageAcc: LatLongResponseType[] = [...acc.slice(sI, sI + PAGE_SIZE)];
+        if (sI + PAGE_SIZE >= acc.length) {
+          returnVal.nextToken = { lat: 0, lng: 0 };
           returnVal.results = [...pageAcc];
         } else {
+          returnVal.nextToken = pageAcc[pageAcc.length - 1];
           returnVal.results = [...pageAcc];
         }
       } else {
