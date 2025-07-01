@@ -14,6 +14,13 @@
     width: 250px;
     background-color: colors.$color-heavy-blue-alt;
     color: colors.$color-white;
+    &-icon {
+      position: absolute;
+      cursor: pointer;
+      right: 0;
+      top: 0;
+      padding: 1rem;
+    }
     &.active {
       z-index: 10000;
       display: flex;
