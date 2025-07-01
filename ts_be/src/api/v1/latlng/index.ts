@@ -143,14 +143,14 @@ export const getLatLngParty = async (
           i % 2 === 0
             ? val.lat + offset * ARC_DEGREE_SEP_LAT
             : val.lat - offset * ARC_DEGREE_SEP_LAT,
-        ).toPrecision(6),
+        ).toPrecision(12),
       );
       val.lng = parseFloat(
         Number(
           i % 2 === 0
             ? val.lng - offset * ARC_DEGREE_SEP_LNG
             : val.lng + offset * ARC_DEGREE_SEP_LNG,
-        ).toPrecision(6),
+        ).toPrecision(12),
       );
       acc.push(val);
       return acc;

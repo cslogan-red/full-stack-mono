@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { useWorker } from '../../hooks';
 import {
-  getWorkerDataSet,
-  getWorkerPartyDataSet,
+  getNonBlockingDataSet,
+  getBlockingDataSet,
   type WorkerDataResponseType,
   type LatLongResponseType,
+  BASE_URL,
 } from '../../services/appDataService';
-import { EXT_START_LAT, EXT_START_LNG, BATCH_SIZE } from '../../utils/general';
+import {
+  EXT_START_LAT,
+  EXT_START_LNG,
+  EXT_VBOX_START_LNG,
+  EXT_VBOX_START_LAT,
+  BATCH_SIZE,
+} from '../../utils/general';
 // components
 import SideNav from '../SideNav/SideNav';
 import MapBox from '../MapBox/MapBox';
@@ -15,49 +22,51 @@ import './AppContainer.scss';
 
 const AppContainer = () => {
   const [smallWorker, { status: smallWorkerStatus, kill: smallWorkerKill }] =
-    useWorker(getWorkerDataSet);
+    useWorker(getNonBlockingDataSet);
   const [largeWorker, { status: largeWorkerStatus, kill: largeWorkerKill }] =
-    useWorker(getWorkerDataSet);
+    useWorker(getNonBlockingDataSet);
   const [partyWorker, { status: partyWorkerStatus, kill: partyWorkerKill }] =
-    useWorker(getWorkerPartyDataSet);
-  const [workerResults, setWorkerResults] = useState<WorkerDataResponseType | undefined>(undefined);
-  const [longWorkerResults, setLongWorkerResults] = useState<WorkerDataResponseType | undefined>(
-    undefined,
-  );
-  const [partyWorkerResults, setPartyWorkerResults] = useState<WorkerDataResponseType | undefined>(
-    undefined,
-  );
+    useWorker(getNonBlockingDataSet);
+  const [workerResults, setWorkerResults] = useState<LatLongResponseType[]>([]);
+  const [shortResults, setShortResults] = useState<LatLongResponseType[]>([]);
+  const [longResults, setLongResults] = useState<LatLongResponseType[]>([]);
+  const [partyResults, setPartyResults] = useState<LatLongResponseType[]>([]);
   const [isMultiThreaded, setIsMultiThreaded] = useState<boolean>(true);
   const [smallBatchSize, setSmallBatchSize] = useState<number>(BATCH_SIZE.small);
   const [largeBatchSize, setLargeBatchSize] = useState<number>(BATCH_SIZE.large);
   const [viewBox, setViewBox] = useState<LatLongResponseType>({
-    lat: EXT_START_LAT,
-    lng: EXT_START_LNG,
+    lat: EXT_VBOX_START_LAT,
+    lng: EXT_VBOX_START_LNG,
   });
-  const [isPartyMode, setPartyMode] = useState<boolean>(false);
   const getSmBS = () => (smallBatchSize > BATCH_SIZE.smallMax ? BATCH_SIZE.small : smallBatchSize);
   const getLgBS = () => (largeBatchSize > BATCH_SIZE.largeMax ? BATCH_SIZE.large : largeBatchSize);
 
   // primary middleware orchestrators, since lacking a true middlware store for this demo
   const smallWorkloadHandler = async () => {
+    setShortResults([]);
     const isMT = isMultiThreaded;
     const result = isMT
       ? await smallWorker({
+          url: BASE_URL,
           startLat: viewBox.lat,
           startLng: viewBox.lng,
           batchSize: getSmBS(),
           isSmall: true,
         })
-      : await getWorkerDataSet({
+      : await getBlockingDataSet({
+          // single-threaded must perform data fetch AND CPU calc on single thread
+          url: BASE_URL,
           startLat: viewBox.lat,
           startLng: viewBox.lng,
           batchSize: getSmBS(),
           isSmall: true,
         });
+    const workerResults = [] as LatLongResponseType[];
     if (result.nextToken.lat > 0) {
       let pageNum = 1;
       // handle paginated results multi or single threaded
-      setWorkerResults(result);
+      workerResults.push(...result.results);
+      setShortResults([...workerResults, ...result.results]);
       let paginatedResult = {
         results: [] as LatLongResponseType[],
         nextToken: { ...result.nextToken },
@@ -66,33 +75,52 @@ const AppContainer = () => {
         const startLat = paginatedResult.nextToken.lat;
         const startLng = paginatedResult.nextToken.lng;
         paginatedResult = isMT
-          ? await smallWorker({ startLat, startLng, batchSize: getSmBS(), isSmall: true, pageNum })
-          : await getWorkerDataSet({
+          ? await smallWorker({
+              url: BASE_URL,
+              startLat,
+              startLng,
+              batchSize: getSmBS(),
+              isSmall: true,
+              pageNum,
+            })
+          : await getBlockingDataSet({
+              url: BASE_URL,
               startLat,
               startLng,
               batchSize: getSmBS(),
               isSmall: true,
               pageNum,
             });
-        setWorkerResults({ ...paginatedResult });
+        workerResults.push(...paginatedResult.results);
+        setShortResults([...workerResults, ...paginatedResult.results]);
         pageNum++;
       }
     } else {
-      setWorkerResults({ ...result });
+      workerResults.push(...result.results);
+      setShortResults([...workerResults, ...result.results]);
     }
   };
   const largeWorkloadHandler = async () => {
+    setLongResults([]);
     const isMT = isMultiThreaded;
     const result = isMT
-      ? await largeWorker({ startLat: viewBox.lat, startLng: viewBox.lng, batchSize: getLgBS() })
-      : await getWorkerDataSet({
+      ? await largeWorker({
+          url: BASE_URL,
+          startLat: viewBox.lat,
+          startLng: viewBox.lng,
+          batchSize: getLgBS(),
+        })
+      : await getBlockingDataSet({
+          url: BASE_URL,
           startLat: viewBox.lat,
           startLng: viewBox.lng,
           batchSize: getLgBS(),
         });
+    const workerResults = [] as LatLongResponseType[];
     if (result.nextToken.lat > 0) {
       // handle paginated results multi or single threaded
-      setLongWorkerResults(result);
+      workerResults.push(...result.results);
+      setLongResults([...workerResults, ...result.results]);
       let paginatedResult = {
         results: [] as LatLongResponseType[],
         nextToken: { ...result.nextToken },
@@ -102,44 +130,68 @@ const AppContainer = () => {
         const startLat = paginatedResult.nextToken.lat;
         const startLng = paginatedResult.nextToken.lng;
         paginatedResult = isMT
-          ? await largeWorker({ startLat, startLng, batchSize: getLgBS(), pageNum })
-          : await getWorkerDataSet({ startLat, startLng, batchSize: getLgBS(), pageNum });
-        setLongWorkerResults({ ...paginatedResult });
+          ? await largeWorker({
+              url: BASE_URL,
+              startLat,
+              startLng,
+              batchSize: getLgBS(),
+              pageNum,
+            })
+          : await getBlockingDataSet({
+              url: BASE_URL,
+              startLat,
+              startLng,
+              batchSize: getLgBS(),
+              pageNum,
+            });
+        workerResults.push(...paginatedResult.results);
+        setLongResults([...workerResults, ...paginatedResult.results]);
         pageNum++;
       }
     } else {
-      setLongWorkerResults({ ...result });
+      workerResults.push(...result.results);
+      setLongResults([...workerResults, ...result.results]);
     }
   };
   // party handler!
   const partyWorkloadHandler = async () => {
+    setWorkerResults([]);
+    const url = `${BASE_URL}/party`;
     const isMT = isMultiThreaded;
     const result = isMT
-      ? await partyWorker({ startLat: viewBox.lat, startLng: viewBox.lng })
-      : await getWorkerPartyDataSet({ startLat: viewBox.lat, startLng: viewBox.lng });
+      ? await partyWorker({ url, startLat: viewBox.lat, startLng: viewBox.lng })
+      : await getBlockingDataSet({ url, startLat: viewBox.lat, startLng: viewBox.lng });
+    const workerResults = [] as LatLongResponseType[];
     if (result.nextToken.lat > 0) {
       let pageNum = 1;
       // handle paginated results multi or single threaded
-      setPartyWorkerResults({ ...result });
-      setPartyMode(!isPartyMode);
+      workerResults.push(...result.results);
+      setPartyResults([...workerResults, ...result.results]);
       let paginatedResult = {
         results: [] as LatLongResponseType[],
         nextToken: { ...result.nextToken },
       };
       while (paginatedResult.nextToken.lat > 0) {
         paginatedResult = isMT
-          ? await partyWorker({ startLat: viewBox.lat, startLng: viewBox.lng, pageNum })
-          : await getWorkerPartyDataSet({
+          ? await partyWorker({
+              url,
+              startLat: viewBox.lat,
+              startLng: viewBox.lng,
+              pageNum,
+            })
+          : await getBlockingDataSet({
+              url,
               startLat: viewBox.lat,
               startLng: viewBox.lng,
               pageNum,
             });
-        setPartyWorkerResults({ ...partyWorkerResults, ...paginatedResult });
+        workerResults.push(...paginatedResult.results);
+        setPartyResults([...workerResults, ...paginatedResult.results]);
         pageNum++;
       }
     } else {
-      setPartyWorkerResults({ ...partyWorkerResults, ...result });
-      setPartyMode(!isPartyMode);
+      workerResults.push(...result.results);
+      setPartyResults([...workerResults, ...result.results]);
     }
   };
 
@@ -174,8 +226,8 @@ const AppContainer = () => {
           smallWorkerHandler={smallWorkerHandler}
           largeWorkerHandler={largeWorkerHandler}
           partyWorkerHandler={partyWorkerHandler}
-          smallWorkerResults={workerResults?.results?.length}
-          largeWorkerResults={longWorkerResults?.results?.length}
+          smallWorkerResults={shortResults?.length}
+          largeWorkerResults={longResults?.length}
           smallItemCountHandler={smallItemCountHandler}
           largeItemCountHandler={largeItemCountHandler}
         />
@@ -186,10 +238,10 @@ const AppContainer = () => {
             startLat={EXT_START_LAT}
             startLng={EXT_START_LNG}
             boundingBoxHandler={boundingBoxHandler}
-            latLngMarkerCoords={workerResults?.results}
-            longLatLngMarkerCoords={longWorkerResults?.results}
-            partyLatLngMarkerCoords={partyWorkerResults?.results}
-            isPartyMode={isPartyMode}
+            latLngMarkerCoords={shortResults}
+            longLatLngMarkerCoords={longResults}
+            partyLatLngMarkerCoords={partyResults}
+            workerResults={workerResults || ([] as WorkerDataResponseType[])}
           />
         </div>
       </div>

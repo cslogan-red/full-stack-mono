@@ -1,4 +1,5 @@
 type WorkerPropsType = {
+  url: string;
   startLat?: number;
   startLng?: number;
   pageNum?: number;
@@ -8,11 +9,14 @@ type WorkerPropsType = {
 export type LatLongResponseType = {
   lat: number;
   lng: number;
+  infoText?: string;
 };
 export type WorkerDataResponseType = {
   results: LatLongResponseType[];
   nextToken: LatLongResponseType;
 };
+
+export const BASE_URL = 'http://localhost:5173/local/api/v1/latlng';
 
 /**
  * Fetch an actual large data set from local node server, simulate complex CPU work on data
@@ -22,17 +26,27 @@ export type WorkerDataResponseType = {
  * @param props @WorkerPropsType
  * @returns @WorkerDataResponseType
  */
-export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDataResponseType> => {
-  const { startLat, startLng, batchSize = 25, isSmall, pageNum } = props;
-  let returnVal = { results: [], nextToken: { lat: 0, lng: 0 } };
+export const getNonBlockingDataSet = async (
+  props: WorkerPropsType,
+): Promise<WorkerDataResponseType> => {
+  const { url, startLat, startLng, batchSize = 25, isSmall, pageNum } = props;
+  let returnVal = { results: [] as LatLongResponseType[], nextToken: { lat: 0, lng: 0 } };
   try {
     const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
     const pageNumStr = pageNum ? `&pageNum=${pageNum}` : '';
     const result = await fetch(
-      `http://localhost:5173/local/api/v1/latlng?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}${pageNumStr}`,
+      `${url}?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}${pageNumStr}`,
     );
     const resultJson = await result.json();
-    returnVal = resultJson.returnVal;
+    // 
+    const mappedResponse = {
+      ...resultJson.returnVal,
+      results: resultJson.returnVal?.results?.map((val: LatLongResponseType) => ({
+        ...val,
+        infoText: 'Web worker optimization complete, location fully loaded.',
+      })),
+    };
+    returnVal = mappedResponse;
 
     // simulate compute intensive workload on every data hyrdation request
     const numbers = [...Array(9000000)].map(() => ~~(Math.random() * 1000000));
@@ -45,23 +59,23 @@ export const getWorkerDataSet = async (props: WorkerPropsType): Promise<WorkerDa
 };
 
 /**
- * Fetch an actual large data set from local node server, simulate complex CPU work on data
+ * Fetch an actual large BLOCKING data set from local node server, simulate complex CPU work on data
  * In single-threaded (UI thread) mode this will result in UI chug and stuttering, while
  * mulit-threaded requests pushed to Workers through useWorker hook continue to process separately
  * passing data back to the main thread in pages as it becomes available for a smooth UI experience
  * @param props @WorkerPropsType
  * @returns @WorkerDataResponseType
  */
-export const getWorkerPartyDataSet = async (
+export const getBlockingDataSet = async (
   props: WorkerPropsType,
 ): Promise<WorkerDataResponseType> => {
-  const { startLat, startLng, pageNum } = props;
+  const { url, startLat, startLng, batchSize = 25, isSmall, pageNum } = props;
   let returnVal = { results: [], nextToken: { lat: 0, lng: 0 } };
   try {
     const endStr = startLat && startLng ? `&startLat=${startLat}&startLng=${startLng}` : '';
     const pageNumStr = pageNum ? `&pageNum=${pageNum}` : '';
     const result = await fetch(
-      `http://localhost:5173/local/api/v1/latlng/party?${endStr}${pageNumStr}`,
+      `${url}?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}${pageNumStr}`,
     );
     const resultJson = await result.json();
     returnVal = resultJson.returnVal;

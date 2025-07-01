@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Map, {
   Marker,
   type MapLayerTouchEvent,
@@ -19,13 +19,16 @@ export const MapBoxRenderers = {
 
 export type MapBoxRenderersType = (typeof MapBoxRenderers)[keyof typeof MapBoxRenderers];
 
+type MapBoxMarkerType = LatLongResponseType & { infoText?: string };
+
 type MapBoxProps = {
   startLat: number;
   startLng: number;
   boundingBoxHandler?: (latlng: LatLongResponseType) => void;
-  latLngMarkerCoords?: LatLongResponseType[];
-  longLatLngMarkerCoords?: LatLongResponseType[];
-  partyLatLngMarkerCoords?: LatLongResponseType[];
+  latLngMarkerCoords?: MapBoxMarkerType[];
+  longLatLngMarkerCoords?: MapBoxMarkerType[];
+  partyLatLngMarkerCoords?: MapBoxMarkerType[];
+  workerResults?: MapBoxMarkerType[];
   isPartyMode?: boolean;
   renderer?: MapBoxRenderersType;
 };
@@ -44,40 +47,45 @@ const MapBox = ({
   latLngMarkerCoords = [],
   longLatLngMarkerCoords = [],
   partyLatLngMarkerCoords = [],
+  workerResults,
 }: MapBoxProps) => {
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoBody, setInfoBody] = useState<React.ReactElement | null>(null);
+  const infoHandler = (coords: MapBoxMarkerType) => {
+    setShowInfo(false);
+    setInfoBody(
+      <>
+        <div>Location latitude: {coords.lat}</div>
+        <div>Location longitude: {coords.lng}</div>
+        <div>
+          {coords.infoText ? `Location detail: ${coords.infoText}` : 'Fetching location detail...'}
+        </div>
+      </>,
+    );
+    setShowInfo(true);
+  };
+  const mapper = (coords: MapBoxMarkerType, i: number) => (
+    <Marker
+      key={`${coords.lat * Math.random()}-m`}
+      longitude={coords.lng}
+      latitude={coords.lat}
+      onClick={() => infoHandler(coords)}
+    >
+      <div key={`${coords.lat * Math.random()}-d`} className={'marker'}>
+        <img key={`${coords.lat * Math.random()}-i`} src={i % 2 === 0 ? MapMarker : AltMapMarker} />
+      </div>
+    </Marker>
+  );
   // track results as they stream in from background worker threads
-  const markers = useMemo(
-    () =>
-      latLngMarkerCoords.map((coords) => (
-        <Marker key={`${coords.lat}-m`} longitude={coords.lng} latitude={coords.lat}>
-          <div key={`${coords.lat}-d`} className={'marker'}>
-            <img key={`${coords.lat}-i`} src={AltMapMarker} />
-          </div>
-        </Marker>
-      )),
-    [latLngMarkerCoords],
+  const workerMarkers = useMemo(
+    () => (workerResults && workerResults?.length > 0 ? workerResults.map(mapper) : undefined),
+    [workerResults],
   );
-  const longMarkers = useMemo(
-    () =>
-      longLatLngMarkerCoords.map((coords) => (
-        <Marker key={`${coords.lat}-m`} longitude={coords.lng} latitude={coords.lat}>
-          <div key={`${coords.lat}-d`} className={'marker'}>
-            <img key={`${coords.lat}-i`} src={MapMarker} />
-          </div>
-        </Marker>
-      )),
-    [longLatLngMarkerCoords],
-  );
+  const markers = useMemo(() => latLngMarkerCoords.map(mapper), [latLngMarkerCoords]);
+  const longMarkers = useMemo(() => longLatLngMarkerCoords.map(mapper), [longLatLngMarkerCoords]);
   const partyMarkers = useMemo(
-    () =>
-      partyLatLngMarkerCoords.map((coords, i) => (
-        <Marker key={`${coords.lat}-m`} longitude={coords.lng} latitude={coords.lat}>
-          <div key={`${coords.lat}-d`} className={'marker'}>
-            <img key={`${coords.lat}-i`} src={i % 2 === 0 ? MapMarker : AltMapMarker} />
-          </div>
-        </Marker>
-      )),
-    [longLatLngMarkerCoords],
+    () => partyLatLngMarkerCoords.map(mapper),
+    [partyLatLngMarkerCoords],
   );
   return (
     <div className={'mapbox-container'} aria-label={'mapbox-container'}>
@@ -114,12 +122,13 @@ const MapBox = ({
               }
             }}
           >
-            {[...markers, ...longMarkers, ...partyMarkers]}
+            {workerMarkers ? [...workerMarkers] : [...markers, ...longMarkers, ...partyMarkers]}
           </Map>
         ) : (
           <span>Invalid mapbox renderer selected, please try again.</span>
         )}
       </div>
+      <div className={`mapbox-container--info ${showInfo ? 'active' : ''}`}>{infoBody}</div>
     </div>
   );
 };

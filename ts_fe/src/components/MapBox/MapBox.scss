@@ -5,6 +5,27 @@
 .mapbox-container {
   height: 100%;
   width: 100%;
+  &--info {
+    position: absolute;
+    display: none;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 250px;
+    background-color: colors.$color-heavy-blue-alt;
+    color: colors.$color-white;
+    &.active {
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 1rem;
+      &>div {
+        margin-bottom: 1rem;
+      }
+    }
+  }
   &--renderer {
     width: 100%;
     height: 100%;
