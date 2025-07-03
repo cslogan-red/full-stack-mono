@@ -40,4 +40,35 @@ describe('SideNav tests', () => {
     fireEvent.click(getByLabelText('sidenav--content-switch'));
     expect(queryByLabelText('sidenav--content-switch')).toBeDefined();
   });
+
+  it('can render SideNav with multi-threaded checked', () => {
+    const handler = () => {};
+    const { getByLabelText } = render(
+      <SideNav
+        multiThreadedCheckedHandler={handler}
+        smallItemCountHandler={handler}
+        largeItemCountHandler={handler}
+        smallWorkerHandler={{
+          kill: handler,
+          status: '',
+          clickHandler: handler,
+        }}
+        largeWorkerHandler={{
+          kill: handler,
+          status: '',
+          clickHandler: handler,
+        }}
+        partyWorkerHandler={{
+          kill: handler,
+          status: '',
+          clickHandler: handler,
+        }}
+        smallWorkerResults={undefined}
+        largeWorkerResults={undefined}
+      />,
+    );
+    const checkbox = getByLabelText('sidenav--content-switch');
+    expect(checkbox).toBeDefined();
+    fireEvent.click(checkbox);
+  });
 });

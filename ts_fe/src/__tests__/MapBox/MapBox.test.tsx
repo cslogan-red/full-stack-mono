@@ -14,4 +14,16 @@ describe('MapBox tests', () => {
     expect(queryByLabelText('mapbox-container')).toBeTruthy();
     expect(queryByLabelText('mapbox-container-screw')).toBeTruthy();
   });
+
+  it('can render Mapbox with markers', () => {
+    const { queryByLabelText } = render(
+      <MapBox
+        startLat={1}
+        startLng={1}
+        latLngMarkerCoords={[{ lat: 1, lng: 1, infoText: 'Test Marker' }]}
+      />,
+    );
+    expect(queryByLabelText('mapbox-container')).toBeTruthy();
+    expect(queryByLabelText('mapbox-container-screw')).toBeTruthy();
+  });
 });

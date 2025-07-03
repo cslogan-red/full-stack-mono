@@ -18,4 +18,9 @@ describe('AppContainer tests', () => {
     const { queryByLabelText } = render(<AppContainer />);
     expect(queryByLabelText('app-container-map')).toBeTruthy();
   });
+
+  it('can render AppContainer side nav without error', () => {
+    const { queryByLabelText } = render(<AppContainer />);
+    expect(queryByLabelText('app-container-sidenav')).toBeTruthy();
+  });
 });

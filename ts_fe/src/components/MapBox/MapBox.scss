@@ -67,6 +67,9 @@
       border: forms.$map-border;
       border-radius: 1.5rem;
       box-shadow: shadows.$map-shadow;
+      .active img {
+        filter: brightness(0) saturate(50%) invert(90%) sepia(12%) saturate(812%) hue-rotate(152deg) brightness(106%) contrast(105%);
+      }
     }
   }
 };

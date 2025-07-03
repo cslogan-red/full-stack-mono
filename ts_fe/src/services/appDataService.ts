@@ -38,7 +38,7 @@ export const getNonBlockingDataSet = async (
       `${url}?batchSize=${batchSize}&isSmall=${isSmall ?? false}${endStr}${pageNumStr}`,
     );
     const resultJson = await result.json();
-    // 
+    //
     const mappedResponse = {
       ...resultJson.returnVal,
       results: resultJson.returnVal?.results?.map((val: LatLongResponseType) => ({

@@ -1,6 +1,6 @@
-[2025-07-01T23:31:10.814Z] [WARN] Test file log message with level
-[2025-07-01T23:31:10.814Z] [INFO] Test file log message with level
-[2025-07-01T23:31:10.832Z] [INFO] ~~~USER_AGENT_MANIPULATION_ATTEMPT: suspicious User-Agent: sqlmap, from IP: 192.168.0.1
-[2025-07-01T23:31:10.835Z] [INFO] ~~~REQUEST_BODY_SIZE_EXCEEDED: Request from 192.168.0.1 exceeds allowed size,
+[2025-07-03T18:30:56.240Z] [WARN] Test file log message with level
+[2025-07-03T18:30:56.240Z] [INFO] Test file log message with level
+[2025-07-03T18:30:56.251Z] [INFO] ~~~USER_AGENT_MANIPULATION_ATTEMPT: suspicious User-Agent: sqlmap, from IP: 192.168.0.1
+[2025-07-03T18:30:56.252Z] [INFO] ~~~SQL_INJECTION_ATTEMPT: Detected potential SQL injection in URL: /SELECT, from IP: 192.168.0.1
+[2025-07-03T18:30:56.253Z] [INFO] ~~~REQUEST_BODY_SIZE_EXCEEDED: Request from 192.168.0.1 exceeds allowed size,
           content-length: 1000001
-[2025-07-01T23:31:10.834Z] [INFO] ~~~SQL_INJECTION_ATTEMPT: Detected potential SQL injection in URL: /SELECT, from IP: 192.168.0.1

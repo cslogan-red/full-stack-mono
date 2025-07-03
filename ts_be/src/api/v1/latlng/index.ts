@@ -17,6 +17,39 @@ type LatLongRequestType = {
   req: Request;
 };
 
+const pageinateResponse = (props: {
+  pageNum: number;
+  pageSize: number;
+  acc: LatLongType[];
+}): LatLongResponseType => {
+  const { pageNum, pageSize, acc } = props;
+  const returnVal = {
+    results: acc,
+    nextToken: { lat: 0, lng: 0 },
+  };
+  if (pageNum) {
+    // n+1 pagination
+    const sI = pageNum * pageSize;
+    const pageAcc: LatLongType[] = [...acc.slice(sI, sI + pageSize)];
+    if (sI + pageSize >= acc.length) {
+      returnVal.nextToken = { lat: 0, lng: 0 };
+      returnVal.results = [...pageAcc];
+    } else {
+      returnVal.nextToken = pageAcc[pageAcc.length - 1];
+      returnVal.results = [...pageAcc];
+    }
+  } else {
+    // first page, possible pagination
+    if (acc.length <= pageSize) {
+      returnVal.results = [...acc];
+    } else {
+      returnVal.results = [...acc.slice(0, pageSize)];
+      returnVal.nextToken = acc[pageSize - 1];
+    }
+  }
+  return returnVal;
+};
+
 /**
  * simple linear degress of lat/lng arc calculator for a given input number (batchSize) with
  * paginated response support in PAGE_SIZE up until all calculated results are returned
@@ -29,7 +62,7 @@ export const getLatLng = async (
 ): Promise<LatLongResponseType> => {
   const query = props?.req?.query;
   const acc: LatLongType[] = [];
-  const returnVal = {
+  let returnVal = {
     results: acc,
     nextToken: { lat: 0, lng: 0 },
   };
@@ -63,26 +96,13 @@ export const getLatLng = async (
     acc.push(currentResult);
   }
   // paginate based on PAGE_SIZE
-  if (pageNum) {
-    // n+1 pagination
-    const sI = parseInt(pageNum as string) * PAGE_SIZE;
-    const pageAcc: LatLongType[] = [...acc.slice(sI, sI + PAGE_SIZE)];
-    if (sI + PAGE_SIZE >= acc.length) {
-      returnVal.nextToken = { lat: 0, lng: 0 };
-      returnVal.results = [...pageAcc];
-    } else {
-      returnVal.nextToken = pageAcc[pageAcc.length - 1];
-      returnVal.results = [...pageAcc];
-    }
-  } else {
-    // first page, possible pagination
-    if (acc.length <= PAGE_SIZE) {
-      returnVal.results = [...acc];
-    } else {
-      returnVal.results = [...acc.slice(0, PAGE_SIZE)];
-      returnVal.nextToken = acc[PAGE_SIZE - 1];
-    }
-  }
+  returnVal = {
+    ...pageinateResponse({
+      pageNum: parseInt(pageNum as string),
+      pageSize: PAGE_SIZE,
+      acc,
+    }),
+  };
   return returnVal;
 };
 
@@ -92,7 +112,7 @@ export const getLatLngParty = async (
 ): Promise<LatLongResponseType> => {
   const query = props?.req?.query;
   const acc: LatLongType[] = [];
-  const returnVal = {
+  let returnVal = {
     results: acc,
     nextToken: { lat: 0, lng: 0 },
   };
@@ -159,24 +179,12 @@ export const getLatLngParty = async (
     .sort((a, b) => a.sort - b.sort)
     .map(({ value }) => value);
   // paginate based on PAGE_SIZE
-  if (pageNum) {
-    // n+1 pagination
-    const sI = parseInt(pageNum as string) * PAGE_SIZE;
-    const pageAcc: LatLongType[] = [...acc.slice(sI, sI + PAGE_SIZE)];
-    if (sI + PAGE_SIZE >= acc.length) {
-      returnVal.results = [...pageAcc];
-    } else {
-      returnVal.nextToken = pageAcc[pageAcc.length - 1];
-      returnVal.results = [...pageAcc];
-    }
-  } else {
-    // first page, possible pagination
-    if (acc.length <= PAGE_SIZE) {
-      returnVal.results = [...acc];
-    } else {
-      returnVal.results = [...acc.slice(0, PAGE_SIZE)];
-      returnVal.nextToken = acc[PAGE_SIZE - 1];
-    }
-  }
+  returnVal = {
+    ...pageinateResponse({
+      pageNum: parseInt(pageNum as string),
+      pageSize: PAGE_SIZE,
+      acc,
+    }),
+  };
   return returnVal;
 };

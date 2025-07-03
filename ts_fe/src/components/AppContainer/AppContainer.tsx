@@ -42,6 +42,7 @@ const AppContainer = () => {
   const getLgBS = () => (largeBatchSize > BATCH_SIZE.largeMax ? BATCH_SIZE.large : largeBatchSize);
 
   // primary middleware orchestrators, since lacking a true middlware store for this demo
+  // single-threaded must perform data fetch AND CPU calc on single thread via getBlockingDataSet
   const smallWorkloadHandler = async () => {
     setShortResults([]);
     const isMT = isMultiThreaded;
@@ -54,7 +55,6 @@ const AppContainer = () => {
           isSmall: true,
         })
       : await getBlockingDataSet({
-          // single-threaded must perform data fetch AND CPU calc on single thread
           url: BASE_URL,
           startLat: viewBox.lat,
           startLng: viewBox.lng,
@@ -220,7 +220,7 @@ const AppContainer = () => {
 
   return (
     <div className={'app-container'} aria-label={'app-container'}>
-      <div className={'app-container--sidenav'}>
+      <div className={'app-container--sidenav'} aria-label={'app-container-sidenav'}>
         <SideNav
           multiThreadedCheckedHandler={multiThreadedCheckedHandler}
           smallWorkerHandler={smallWorkerHandler}

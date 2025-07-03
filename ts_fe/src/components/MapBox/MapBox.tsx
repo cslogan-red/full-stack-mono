@@ -72,7 +72,13 @@ const MapBox = ({
       latitude={coords.lat}
       onClick={() => infoHandler(coords)}
     >
-      <div key={`${coords.lat * Math.random()}-d`} className={'marker'}>
+      <div
+        key={`${coords.lat * Math.random()}-d`}
+        className={'marker'}
+        onMouseOver={(e) => e.currentTarget.classList.add('active')}
+        onMouseOut={(e) => e.currentTarget.classList.remove('active')}
+        aria-label={'mapbox-container-marker'}
+      >
         <img key={`${coords.lat * Math.random()}-i`} src={i % 2 === 0 ? MapMarker : AltMapMarker} />
       </div>
     </Marker>
@@ -130,7 +136,9 @@ const MapBox = ({
         )}
       </div>
       <div className={`mapbox-container--info ${showInfo ? 'active' : ''}`}>
-        <div className={'mapbox-container--info-icon'} onClick={() => setShowInfo(false)}><CloseIcon /></div>
+        <div className={'mapbox-container--info-icon'} onClick={() => setShowInfo(false)}>
+          <CloseIcon />
+        </div>
         {infoBody}
       </div>
     </div>
